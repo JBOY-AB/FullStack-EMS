@@ -20,7 +20,7 @@ const LeaveHistory = ({leaves, isAdmin, onUpdate}) => {
                         <th>Reason</th>
                         <th>Status</th>
                         {isAdmin && <th
-                         className='text-center'>Action</th>}
+                         className='text-center'>Actions</th>}
                       </tr>
                   </thead>
                   <tbody>
