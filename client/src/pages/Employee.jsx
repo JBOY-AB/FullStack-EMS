@@ -8,7 +8,7 @@ const Employee = () => {
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [selectDept, setSelectDept] = useState('')
+  const [selectedDept, setSelectedDept] = useState('')
   const [editEmployee, setEditEmployee] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
 
@@ -16,7 +16,7 @@ const Employee = () => {
     setLoading(true)
 
     const filteredEmployees = dummyEmployeeData.filter((emp) =>
-      selectDept ? emp.department === selectDept : true
+      selectedDept ? emp.department === selectedDept : true
     )
 
     setEmployees(filteredEmployees)
@@ -24,7 +24,7 @@ const Employee = () => {
     setTimeout(() => {
       setLoading(false)
     }, 1000)
-  }, [selectDept])
+  }, [selectedDept])
 
   const filtered = employees.filter((emp) =>
     `${emp.firstName} ${emp.lastName} ${emp.position}`
@@ -68,8 +68,8 @@ const Employee = () => {
         </div>
 
         <select
-          value={selectDept}
-          onChange={(e) => setSelectDept(e.target.value)}
+          value={selectedDept}
+          onChange={(e) => setSelectedDept(e.target.value)}
           className='max-w-40'
         >
           <option value=''>All Departments</option>
