@@ -22,7 +22,7 @@ export const login = async (req, res) => {
         }
 
         if(role_type === "employee" && user.role !== "EMPLOYEE"){
-            return res.status*(401).json({error: "Not authorised as employee "});
+            return res.status(401).json({error: "Not authorised as employee "});
         }
 
         const isValid = await bcrypt.compare(password, user.password)
@@ -59,7 +59,7 @@ export const session = (req, res) =>{
 export const changePassword = async (req, res) =>{
     try {
         const session = req.session;
-        const {currentPassword, newPassword } = res.body;
+        const {currentPassword, newPassword } = req.body;
         if(!currentPassword || !newPassword){
             return res.status(400).json({error: "Both password are required"});
         }

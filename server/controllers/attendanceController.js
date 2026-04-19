@@ -1,5 +1,5 @@
-import Attendance from "../models/attendance";
-import Employee from "../models/Employee";
+import Attendance from "../models/attendance.js";
+import Employee from "../models/Employee.js";
 
 // clock in/out, view attendance records, update attendance status
 
