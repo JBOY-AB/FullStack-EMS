@@ -24,6 +24,22 @@ app.use(express.json());
 
 const upload = multer();
 
+// Initialize database connection for serverless
+let dbConnected = false;
+
+app.use(async (req, res, next) => {
+  if (!dbConnected) {
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (error) {
+      console.error("Database connection error:", error);
+      return res.status(500).json({ error: "Database connection failed" });
+    }
+  }
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
@@ -51,4 +67,10 @@ const startServer = async () => {
   }
 };
 
-startServer();
+// Export for Vercel serverless
+export default app;
+
+// Only start server locally, not in serverless environment
+if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+  startServer();
+}
