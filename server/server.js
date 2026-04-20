@@ -11,6 +11,9 @@ import leaveRouter from "./routes/leaveRoutes.js";
 import payslipsRouter from "./routes/payslipsRoutes.js";
 import dashboardRouter from "./routes/dashboardRoutes.js";
 
+import { serve } from "inngest/express";
+import { inngest, functions } from "./inngest/index.js";
+
 
 
 const app = express();
@@ -31,6 +34,8 @@ app.use("/api/attendance", attendanceRouter)
 app.use("/api/leaves", leaveRouter)
 app.use("/api/payslips", payslipsRouter)
 app.use("/api/dashboard", dashboardRouter)
+
+app.use("/api/inngest", serve({ client: inngest, functions }));
 
 const startServer = async () => {
   try {
