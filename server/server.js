@@ -9,6 +9,7 @@ import profileRouter from "./routes/profileRoutes.js";
 import attendanceRouter from "./routes/attendanceRoutes.js";
 import leaveRouter from "./routes/leaveRoutes.js";
 import payslipsRouter from "./routes/payslipsRoutes.js";
+import dashboardRouter from "./routes/dashboardRoutes.js";
 
 
 
@@ -29,6 +30,7 @@ app.use("/api/profile", profileRouter)
 app.use("/api/attendance", attendanceRouter)
 app.use("/api/leaves", leaveRouter)
 app.use("/api/payslips", payslipsRouter)
+app.use("/api/dashboard", dashboardRouter)
 
 const startServer = async () => {
   try {
