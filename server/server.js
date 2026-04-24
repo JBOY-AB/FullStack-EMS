@@ -14,7 +14,11 @@ import dashboardRouter from "./routes/dashboardRoutes.js";
 import { serve } from "inngest/express";
 import { inngest, functions } from "./inngest/index.js";
 
-
+console.log("🔧 Starting server...");
+console.log("🔍 Environment check:");
+console.log("  - MONGODB_URI:", process.env.MONGODB_URI ? "Set" : "NOT SET");
+console.log("  - JWT_SECRET:", process.env.JWT_SECRET ? "Set" : "NOT SET");
+console.log("  - NODE_ENV:", process.env.NODE_ENV);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -30,10 +34,12 @@ let dbConnected = false;
 app.use(async (req, res, next) => {
   if (!dbConnected) {
     try {
+      console.log("📡 Attempting database connection...");
       await connectDB();
       dbConnected = true;
+      console.log("✅ Database ready!");
     } catch (error) {
-      console.error("Database connection error:", error);
+      console.error("❌ Database connection error:", error);
       return res.status(500).json({ error: "Database connection failed" });
     }
   }
