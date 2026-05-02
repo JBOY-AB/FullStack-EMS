@@ -1,5 +1,5 @@
 import { DEPARTMENTS } from "../constants/departments.js";
-import Attendance from "../models/Attendance.js";
+import Attendance from "../models/attendance.js";
 import Employee from "../models/Employee.js";
 import LeaveApplication from "../models/LeaveApplication.js";
 import Payslip from "../models/Payslip.js";

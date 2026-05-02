@@ -2,7 +2,6 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import multer from "multer";
-import mongoose from "mongoose";
 import connectDB from "./config/db.js";
 import authRouter from "./routes/authRoutes.js";
 import employeesRouter from "./routes/employeeRoutes.js";
@@ -25,32 +24,20 @@ app.use(express.json());
 
 const upload = multer();
 
-// Global database connection cache for serverless
-let cachedDb = null;
+// Initialize database connection for serverless
+let dbConnected = false;
 
-const connectToDatabase = async () => {
-  if (cachedDb) {
-    return cachedDb;
-  }
-
-  try {
-    await connectDB();
-    cachedDb = mongoose.connection;
-    return cachedDb;
-  } catch (error) {
-    console.error("Database connection error:", error);
-    throw error;
-  }
-};
-
-// Middleware to ensure database connection
 app.use(async (req, res, next) => {
-  try {
-    await connectToDatabase();
-    next();
-  } catch (error) {
-    return res.status(500).json({ error: "Database connection failed" });
+  if (!dbConnected) {
+    try {
+      await connectDB();
+      dbConnected = true;
+    } catch (error) {
+      console.error("Database connection error:", error);
+      return res.status(500).json({ error: "Database connection failed" });
+    }
   }
+  next();
 });
 
 app.get("/", (req, res) => {
