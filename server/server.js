@@ -77,6 +77,6 @@ const startServer = async () => {
 export default app;
 
 // Only start server locally, not in serverless environment
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+if (!process.env.VERCEL) {
   startServer();
 }
