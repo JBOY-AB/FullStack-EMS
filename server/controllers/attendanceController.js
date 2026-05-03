@@ -1,5 +1,5 @@
 import { inngest } from "../inngest/index.js";
-import Attendance from "../models/attendance.js";
+import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 
 // clock in/out, view attendance records, update attendance status
