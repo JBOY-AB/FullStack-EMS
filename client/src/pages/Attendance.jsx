@@ -16,7 +16,7 @@ const Attendance = () => {
       setLoading(false)
     },1000)
   },[])
-
+  
   useEffect(()=>{
     fetchData()
   },[fetchData])
@@ -43,10 +43,8 @@ const Attendance = () => {
          <CheckinButton todayRecord={todayRecord} onAction={fetchData} />
         </div>
       )}
-
       <AttendanceStats history={history} />
       <AttendanceHistory history={history} />
-
     </div>
   )
 }
