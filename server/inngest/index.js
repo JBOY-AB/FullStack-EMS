@@ -22,20 +22,21 @@ const autoCheckOut = inngest.createFunction(
 
     // get attendance data
     let attendance = await Attendance.findById(attendanceId)
+    if(!attendance) return;
 
-    if(!attendance){
+    if (!attendance.checkedOut) {
         // get employee data
         const employee = await Employee.findById(employeeId)
+        if(!employee) return;
 
         // send reminder email
-
         await sendEmail({
             to: employee.email,
             subject: "Attendance Checkout Reminder",
-            body: `<div style="max-width: 600px;>
+            body: `<div style="max-width: 600px;">
             <h2>Hi ${employee.firstName},</h2>
             <p style="font-size: 16px">You have a check-in in ${employee.department} today:</p>
-            <p style="font-size: 18px; font-weight: bold; color:#007bff; margin: 8px 0;">${attendance.checkIn?.toLocaleTimeString()}</p>
+            <p style="font-size: 18px; font-weight: bold; color:#007bff; margin: 8px 0;">${new Date(attendance.checkIn).toLocaleTimeString()}</p>
             <p style="font-size: 16px">Please make sure to check-out in one hour.</p>
             <p style="font-size: 16px">If you have any questions, please contact your admin.</p>
             <br />
@@ -44,18 +45,17 @@ const autoCheckOut = inngest.createFunction(
             </div>`
         })
 
-        // After 110hrs mark attendabce as checked out with states "LATE"
+        // After 1hr mark attendance as checked out with status "LATE"
         await step.sleepUntil("wait-for-1-hours", new Date(Date.now().getTime() + 1 * 60 * 60 * 1000))
 
         attendance = await Attendance.findById(attendanceId)
 
-        if(!attendance.checkedOut){
+        if(attendance && !attendance.checkedOut){
             attendance.checkedOut = new Date(attendance.checkIn).getTime() + 4 * 60 * 60 * 1000;
             attendance.workingHours = 4;
             attendance.dayType = "Half Day";
             attendance.status = "LATE";
             await attendance.save();
-           
         }
     }
 
