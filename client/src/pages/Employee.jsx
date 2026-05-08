@@ -3,6 +3,7 @@ import { Plus, Search, X } from 'lucide-react'
 import { dummyEmployeeData, DEPARTMENTS } from '../assets/assets'
 import EmployeeCard from '../components/EmployeeCard'
 import EmployeeForm from '../components/EmployeeForm'
+import api from '../api/axios'
 
 const Employee = () => {
   const [employees, setEmployees] = useState([])
@@ -12,18 +13,16 @@ const Employee = () => {
   const [editEmployee, setEditEmployee] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
 
-  const fetchEmployees = useCallback(() => {
-    setLoading(true)
-
-    const filteredEmployees = dummyEmployeeData.filter((emp) =>
-      selectedDept ? emp.department === selectedDept : true
-    )
-
-    setEmployees(filteredEmployees)
-
-    setTimeout(() => {
+  const fetchEmployees = useCallback(async () => {
+    try {
+      const url = selectedDept ? `/employees?department=${selectedDept}` : "/employees";
+      const res = await api.get(url)
+      setEmployees(res.data);
+    } catch (error) {
+      console.error("Failed to fetch employees")
+    }finally {
       setLoading(false)
-    }, 1000)
+    }
   }, [selectedDept])
 
   const filtered = employees.filter((emp) =>

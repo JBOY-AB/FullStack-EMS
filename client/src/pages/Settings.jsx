@@ -1,25 +1,36 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { dummyProfileData } from "../assets/assets"
 import Loading from "../components/Loading"
 import { Lock } from "lucide-react"
 import ProfileForm from "../components/ProfileForm"
 import ChangePasswordModal from "../components/ChangePasswordModal"
+import { useAuth } from "../context/AuthContext"
+import api from "../api/axios"
+import toast from "react-hot-toast"
+
+
 
 const Settings = () => {
+  const {user} = useAuth()
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
-  const fetchProfile = () => {
-    setTimeout(() => {
-      setProfile(dummyProfileData)
-      setLoading(false)
-    }, 1000)
+ const fetchProfile = async () => {
+  try {
+    const res = await api.get("/profile")
+    const data = res.data
+    if (data) setProfile(data)
+  } catch (err) {
+    toast.error(err?.response?.data?.error || err?.message)
+  } finally {
+    setLoading(false)
   }
+}
 
   useEffect(() => {
     fetchProfile()
-  }, [])
+  }, [user])
 
   if (loading) return <Loading />
 

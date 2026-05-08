@@ -63,7 +63,7 @@ export const clockInOut = async (req, res) => {
             // clock out
     } catch (error) {
         console.error("Attendance error:", error);
-        return res.status(500).json({error: "Operaton failed"});
+        return res.status(500).json({error: "Operation failed"});
     }
 }
 

@@ -1,15 +1,31 @@
-import { Loader, Loader2, Save, User } from 'lucide-react'
+import { Loader2, Save, User } from 'lucide-react'
 import React, { useState } from 'react'
+import api from '../api/axios'
 
 const ProfileForm = ({ initialData = {}, onSuccess }) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
     const [message, setMessage] = useState("")
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        // future logic here
+   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true)
+    setError("")
+    setMessage("")
+
+    const formData = new FormData(e.currentTarget)
+    const data = Object.fromEntries(formData.entries())
+
+    try {
+        await api.post("/profile", data)
+        setMessage("Profile updated successfully")
+        onSuccess?.()
+    } catch (err) {
+        setError(err.response?.data?.error || err.message)
+    } finally {
+        setLoading(false)
     }
+}
 
     return (
         <form onSubmit={handleSubmit} className='card p-5 sm:p-6 mb-6'>
@@ -61,31 +77,48 @@ const ProfileForm = ({ initialData = {}, onSuccess }) => {
                         />
                     </div>
                 </div>
+
                 <div>
                     <label className='block text-sm font-medium text-slate-700 mb-2'>Bio</label>
-                    <textarea disabled={initialData.isDeleted} name='bio' defaultValue={initialData.bio || ""} placeholder='Write a brief bio....' 
-                    className={`resize-none ${initialData.isDeleted ? "bg-slate-50 text-slate-400 cursor-not-allowed" : ""}`} />
-                    <p className='text-xs text-slate-400 mt-1.5'>This will be displayed on your profile</p>
+                    <textarea
+                        disabled={initialData?.isDeleted}
+                        name='bio'
+                        defaultValue={initialData?.bio || ""}
+                        placeholder='Write a brief bio....'
+                        className={`resize-none ${initialData?.isDeleted ? "bg-slate-50 text-slate-400 cursor-not-allowed" : ""}`}
+                    />
+                    <p className='text-xs text-slate-400 mt-1.5'>
+                        This will be displayed on your profile
+                    </p>
                 </div>
 
-                {initialData.isDeleted ? (
+                {initialData?.isDeleted ? (
                     <div className='pt-2'>
-                        <div className='p-4 bg-rose-50 border border-rose-200
-                        rounded-xl text-center'>
-                            <p className='text-rose-600 font-medium tracking-tight'>Account Deactivated </p>
-                            <p className='text-sm text-rose-500 mt-0.5'>You can no longer update your profile </p>
+                        <div className='p-4 bg-rose-50 border border-rose-200 rounded-xl text-center'>
+                            <p className='text-rose-600 font-medium tracking-tight'>
+                                Account Deactivated
+                            </p>
+                            <p className='text-sm text-rose-500 mt-0.5'>
+                                You can no longer update your profile
+                            </p>
                         </div>
                     </div>
-                ):(
+                ) : (
                     <div className='flex justify-end pt-2'>
-
-                        <button type='submit' disabled={loading} className='btn-primary flex items-center gap-2 justify-center w-full sm:w-auto'>
-                            {loading ? <Loader2 className='w-4 h-4 animate-spin' /> : <Save className='w-4 h-4' /> }
+                        <button
+                            type='submit'
+                            disabled={loading}
+                            className='btn-primary flex items-center gap-2 justify-center w-full sm:w-auto'
+                        >
+                            {loading ? (
+                                <Loader2 className='w-4 h-4 animate-spin' />
+                            ) : (
+                                <Save className='w-4 h-4' />
+                            )}
                             Save Changes
                         </button>
                     </div>
                 )}
-
             </div>
         </form>
     )

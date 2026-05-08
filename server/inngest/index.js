@@ -18,15 +18,15 @@ const autoCheckOut = inngest.createFunction(
    const {employeeId, attendanceId } = event.data;
         // wait for 9hours
 
-        await step.sleepUntil("wait-for-9-hours", new Date(Date.now().getTime() + 9 * 60 * 60 * 1000))
+        await step.sleepUntil("wait-for-9-hours", new Date(Date.now() + 9 * 60 * 60 * 1000))
 
     // get attendance data
     let attendance = await Attendance.findById(attendanceId)
     if(!attendance) return;
 
-    if (!attendance.checkedOut) {
+    if (!attendance.checkOut) {
         // get employee data
-        const employee = await Employee.findById(employeeId)
+        const employee = await Employee.findById(FemployeeId)
         if(!employee) return;
 
         // send reminder email
@@ -46,12 +46,12 @@ const autoCheckOut = inngest.createFunction(
         })
 
         // After 1hr mark attendance as checked out with status "LATE"
-        await step.sleepUntil("wait-for-1-hours", new Date(Date.now().getTime() + 1 * 60 * 60 * 1000))
+        await step.sleepUntil("wait-for-1-hours", new Date(Date.now() + 1 * 60 * 60 * 1000))
 
         attendance = await Attendance.findById(attendanceId)
 
-        if(attendance && !attendance.checkedOut){
-            attendance.checkedOut = new Date(attendance.checkIn).getTime() + 4 * 60 * 60 * 1000;
+        if(attendance && !attendance.checkOut){
+            attendance.checkOut = new Date(new Date(attendance.checkIn).getTime() + 4 * 60 * 60 * 1000);
             attendance.workingHours = 4;
             attendance.dayType = "Half Day";
             attendance.status = "LATE";
@@ -74,7 +74,7 @@ const leaveApplicationReminder = inngest.createFunction(
     const {leaveApplicationId} = event.data;
 
     // wait for 24 hours
-    await step.sleepUntil("wait-for-24-hours", new Date(Date.now().getTime() + 24 * 60 * 60 * 1000))
+    await step.sleepUntil("wait-for-24-hours", new Date(Date.now() + 24 * 60 * 60 * 1000))
 
     const leaveApplication = await LeaveApplication.findById(leaveApplicationId)
     if(leaveApplication?.status === "PENDING"){
@@ -195,6 +195,7 @@ const attendanceReminderCron = inngest.createFunction(
         await Promise.all(emailPromises);
       });
     }
+    await Promise.all(emailPromises)
 
     return {
       totalActiveEmployees: activeEmployees.length,

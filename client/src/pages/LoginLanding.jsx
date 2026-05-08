@@ -1,8 +1,13 @@
 import LoginLeftSide from '../components/LoginLeftSide'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { ArrowRightIcon, ShieldIcon, UserIcon } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
+import Loading from '../components/Loading'
 
 const LoginLanding = () => {
+  const { user, loading } = useAuth()
+  if (loading) return <Loading />
+  if (user) return <Navigate to="/" />
   const portaloptions = [
     {
       to: "/login/admin",
@@ -16,7 +21,7 @@ const LoginLanding = () => {
       description: "Access your employee information, benefits, and communication tools.",
       icon: UserIcon
     },
-   
+
   ]
 
   return (
@@ -36,16 +41,16 @@ const LoginLanding = () => {
 
           <div className="space-y-4">
 
-            {portaloptions.map((portal)=>(
+            {portaloptions.map((portal) => (
               <Link key={portal.to} to={portal.to} className="group block bg-slate-50 border border-slate-200 rounded-lg p-5 sm:p-6 transition-all duration-300 hover:border-indigo-400 hover:bg-indigo-50">
 
 
                 <div className="relative z-10 flex items-center justify-between gap-3 sm:gap-5">
                   <h3 className="text-lg text-slate-800 group-hover:text-indigo-600 mb-1 transition-colors">{portal.title}</h3>
-                  <ArrowRightIcon className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all duration-300"/>
+                  <ArrowRightIcon className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all duration-300" />
                 </div>
 
-                
+
               </Link>
 
             ))}
@@ -57,7 +62,7 @@ const LoginLanding = () => {
             <p>© {new Date().getFullYear()} Your Company. All rights reserved.</p>
           </div>
 
-          
+
         </div>
       </div>
     </div>
