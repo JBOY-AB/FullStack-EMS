@@ -11,13 +11,17 @@ import User from "../models/User.js";
 export const getEmployees = async (req, res) => {
   try {
     const { department } = req.query;
+    const userRole = req.session?.role;
 
-    // filter (exclude deleted)
-    const where = { isDeleted: { $ne: true } };
+    // Admins see all employees (deleted at top), regular employees see only active
+    const where = {};
+    if (userRole !== "ADMIN") {
+      where.isDeleted = { $ne: true };
+    }
     if (department) where.department = department;
 
     const employees = await Employee.find(where)
-      .sort({ createdAt: -1 })
+      .sort({ isDeleted: -1, createdAt: -1 })
       .populate("userId", "email role")
       .lean();
 
@@ -222,6 +226,11 @@ export const deleteEmployee = async (req, res) => {
     employee.employmentStatus = "INACTIVE";
 
     await employee.save();
+
+    // disable user account
+    if (employee.userId) {
+      await User.findByIdAndUpdate(employee.userId, { isDisabled: true });
+    }
 
     return res.json({
       success: true,

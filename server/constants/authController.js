@@ -17,6 +17,10 @@ export const login = async (req, res) => {
             return res.status(401).json({error: "Invalid credentials"});
         }
 
+        if(user.isDisabled) {
+            return res.status(401).json({error: "This account has been disabled"});
+        }
+
         if(role_type === "admin" && user.role !== "ADMIN"){
             return res.status(401).json({error: "Not authorised as admin"});
         }

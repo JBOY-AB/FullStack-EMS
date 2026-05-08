@@ -41,7 +41,7 @@ export const createLeave = async (req, res) => {
             status: "PENDING",
         })
             await inngest.send({
-                name: "leave/pending",
+                name: "employee/leave-pending",
                 data: {
                     leaveApplicationId: leave._id,
                 }
@@ -93,7 +93,7 @@ export const getLeaves = async (req, res) => {
     }
 }
 // Update leave
-// PUT /api/leave/:id
+// PATCH /api/leaves/:id/status
 
 export const updateLeaveStatus = async (req, res) => {
  try {
@@ -101,9 +101,18 @@ export const updateLeaveStatus = async (req, res) => {
     if(!["APPROVED", "REJECTED", "PENDING"].includes(status)){
         return res.status(400).json({error: "Invalid status"})
     }
-    const leave = await LeaveApplication.findById(req.params.id, {status}, {returnDocument: "after"});
-    return res.json({success: true, data: leave})
 
+    const leave = await LeaveApplication.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!leave) {
+      return res.status(404).json({ error: "Leave application not found" });
+    }
+
+    return res.json({ success: true, data: leave });
  } catch (error) {
     return res.status(500).json({error: "Failed"});
  }
