@@ -28,6 +28,7 @@ const AttendanceStats = ({ history }) => {
           <div className="p-3 bg-slate-100 rounded-lg group-hover:bg-indigo-50 transition-colors duration-200">
             <s.icon className="w-5 h-5 text-slate-600 group-hover:text-indigo-600 transition-colors duration-200" />
           </div>
+         
 
           <div>
             <p className="text-sm text-slate-500">{s.label}</p>

@@ -41,7 +41,7 @@ export const createLeave = async (req, res) => {
             status: "PENDING",
         })
             await inngest.send({
-                name: "employee/leave-pending",
+                name: "leave/pending",
                 data: {
                     leaveApplicationId: leave._id,
                 }
