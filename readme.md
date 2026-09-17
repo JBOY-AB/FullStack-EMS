@@ -622,3 +622,873 @@ Give me a concise implementation summary containing:
 9. Any remaining issues or things I need to configure manually.
 
 **Most important:** Do not make assumptions about the codebase. Inspect `client` and `server` first, understand the existing flow, and then implement these requirements within the current architecture.
+
+
+# EMS FEATURE — LIVE WEBCAM ATTENDANCE VERIFICATION
+
+You are working on an existing EMS (Employee Management System) with an existing frontend and backend.
+
+The application is already functional.
+
+**DO NOT rebuild the EMS.**
+**DO NOT replace the existing authentication or attendance architecture unless absolutely necessary.**
+
+Your task is to first inspect the existing codebase and then add a secure **Live Webcam Attendance Verification** feature to the existing attendance system.
+
+---
+
+# CORE IDEA
+
+When an employee wants to clock in, they should not simply click:
+
+```text
+Clock In
+```
+
+Instead, the employee should go through a short verification process:
+
+```text
+Employee clicks Clock In
+        ↓
+Attendance session is verified
+        ↓
+Webcam permission requested
+        ↓
+Camera opens
+        ↓
+Employee positions their face inside the camera frame
+        ↓
+System performs a basic live-person verification
+        ↓
+A verification image/frame is captured
+        ↓
+Employee confirms
+        ↓
+Backend validates the attendance request
+        ↓
+Attendance is recorded
+        ↓
+Camera immediately stops
+```
+
+The webcam should NOT remain active after verification.
+
+This is a one-time attendance verification feature, NOT continuous employee surveillance.
+
+---
+
+# STEP 1 — INSPECT THE EXISTING PROJECT FIRST
+
+Before writing code, thoroughly inspect:
+
+## CLIENT
+
+Inspect:
+
+* Employee dashboard
+* Attendance page
+* Clock-in button
+* Clock-out button
+* Authentication state
+* Employee context/store
+* API services
+* Attendance API calls
+* Modal/dialog components
+* Toast/notification system
+* Existing permissions handling
+* Existing camera/media functionality, if any
+* Routing
+* Protected routes
+* Existing UI design system
+
+## SERVER
+
+Inspect:
+
+* Attendance routes
+* Attendance controllers
+* Attendance model/schema
+* Employee/User model
+* Authentication middleware
+* JWT/session implementation
+* Organization/company structure
+* Existing attendance validation
+* Database structure
+* File/image upload system, if any
+* Existing audit logging
+* Existing notification system
+
+## IMPORTANT
+
+Trace the current attendance flow completely:
+
+```text
+Employee
+   ↓
+Frontend Clock-In
+   ↓
+API Request
+   ↓
+Authentication
+   ↓
+Attendance Controller
+   ↓
+Database
+   ↓
+Response
+   ↓
+Frontend State
+```
+
+Understand this before making modifications.
+
+Do not create a second attendance system.
+
+---
+
+# STEP 2 — ATTENDANCE SESSION
+
+Integrate the webcam verification with the existing attendance system.
+
+If the EMS already has a dynamic QR/PIN attendance session, reuse it.
+
+If it does not yet exist, inspect the architecture and implement the minimum required session functionality.
+
+The employer should be able to start an attendance session.
+
+Conceptually:
+
+```text
+EMPLOYER DASHBOARD
+
+Attendance Session
+
+[ Start Session ]
+
+Status:
+🟢 Active
+
+Today's Code:
+4829
+
+Expires in:
+00:27
+```
+
+The attendance code should expire automatically.
+
+Do not trust the frontend timer.
+
+The backend must determine whether the code/session is valid.
+
+---
+
+# STEP 3 — EMPLOYEE CLOCK-IN EXPERIENCE
+
+Change the existing clock-in experience.
+
+When the employee clicks:
+
+```text
+Clock In
+```
+
+do NOT immediately create the attendance record.
+
+Instead open a professional verification modal.
+
+Example:
+
+```text
+┌─────────────────────────────────────┐
+│        Attendance Verification      │
+│                                     │
+│   We need to verify your presence  │
+│   before recording your attendance. │
+│                                     │
+│          ┌───────────────┐          │
+│          │               │          │
+│          │   CAMERA      │          │
+│          │    PREVIEW    │          │
+│          │               │          │
+│          └───────────────┘          │
+│                                     │
+│   Position your face inside frame   │
+│                                     │
+│          [ Verify Presence ]        │
+└─────────────────────────────────────┘
+```
+
+Use the browser's standard camera API:
+
+```text
+navigator.mediaDevices.getUserMedia()
+```
+
+Request video access only when verification starts.
+
+---
+
+# STEP 4 — CAMERA PERMISSION
+
+Handle camera permissions properly.
+
+Possible states:
+
+### Permission granted
+
+Show the live camera preview.
+
+### Permission denied
+
+Show:
+
+```text
+Camera access is required for attendance verification.
+
+Please allow camera access in your browser settings
+and try again.
+```
+
+Do NOT silently fail.
+
+### Camera unavailable
+
+Show an appropriate error:
+
+```text
+We couldn't access your camera.
+
+Please make sure:
+• Your webcam is connected
+• No other application is using it
+• Browser camera permission is enabled
+```
+
+Provide a retry button.
+
+---
+
+# STEP 5 — LIVE PERSON VERIFICATION
+
+Implement a reasonable first version of liveness verification.
+
+The system should NOT simply capture a static image uploaded by the employee.
+
+The verification should happen from the live camera stream.
+
+For the first implementation, use a lightweight interaction such as:
+
+```text
+Look at the camera
+        ↓
+Blink once
+        ↓
+Turn your head slightly
+        ↓
+Verification complete
+```
+
+However, do not invent unreliable computer-vision logic yourself if the project does not already contain such functionality.
+
+First inspect whether the existing project has an appropriate face/liveness library.
+
+If a reliable browser-compatible library is required, use a well-maintained solution that works with the project's current frontend stack.
+
+Do not add an enormous machine-learning framework unnecessarily.
+
+---
+
+# IMPORTANT SECURITY RULE
+
+Do NOT claim that basic webcam detection provides perfect identity verification.
+
+The goal of this feature is:
+
+**attendance presence verification**
+
+not:
+
+**government-grade biometric identity verification.**
+
+If actual face recognition is implemented, clearly separate:
+
+* face detection
+* liveness detection
+* face identity matching
+
+Do not pretend that detecting a face means the system has confirmed the employee's identity.
+
+The employee is already authenticated through the EMS account.
+
+The webcam provides an additional presence signal.
+
+---
+
+# STEP 6 — CAPTURE VERIFICATION IMAGE
+
+Once the verification succeeds, capture a single frame from the live webcam.
+
+The frame should be associated with:
+
+* Employee ID
+* Attendance record ID
+* Organization/company ID
+* Date
+* Verification timestamp
+* Verification type
+* Verification status
+
+Example:
+
+```text
+verificationType: "webcam"
+verificationStatus: "verified"
+verifiedAt: <timestamp>
+```
+
+Do NOT store an entire video recording.
+
+Only capture what is necessary for attendance verification.
+
+---
+
+# STEP 7 — PRIVACY
+
+This feature must NOT continuously monitor employees.
+
+After the verification succeeds:
+
+```text
+Camera stream
+     ↓
+STOP
+```
+
+Make sure all MediaStream tracks are stopped:
+
+```text
+track.stop()
+```
+
+The camera indicator should turn off immediately after verification.
+
+Also stop the camera when:
+
+* Modal closes
+* User cancels
+* User navigates away
+* Verification fails
+* Component unmounts
+
+Do not leave the webcam running in the background.
+
+---
+
+# STEP 8 — SEND VERIFICATION TO BACKEND
+
+Do not trust the frontend to say:
+
+```text
+verificationStatus = verified
+```
+
+The backend must validate the attendance request.
+
+The request should contain the appropriate authentication credentials and verification information.
+
+Follow the project's existing API architecture.
+
+Conceptually:
+
+```text
+POST /attendance/clock-in
+```
+
+or whatever endpoint already exists.
+
+Do NOT create a duplicate endpoint if an existing attendance endpoint can be extended safely.
+
+---
+
+# STEP 9 — BACKEND VALIDATION
+
+Before recording attendance, validate:
+
+### 1. User authentication
+
+Is the employee authenticated?
+
+### 2. Employee status
+
+Is the employee allowed to clock in?
+
+### 3. Attendance session
+
+Is there an active attendance session?
+
+### 4. Session code
+
+If dynamic QR/PIN is being used, is the code/session valid?
+
+### 5. Expiration
+
+Has the attendance session expired?
+
+### 6. Duplicate attendance
+
+Has this employee already clocked in today?
+
+### 7. Verification
+
+Was the webcam verification completed through the expected flow?
+
+### 8. Organization
+
+Does the attendance session belong to the employee's organization?
+
+Only after these validations should the attendance record be created.
+
+---
+
+# STEP 10 — ATTENDANCE RECORD
+
+Extend the existing attendance record only as necessary.
+
+Possible fields:
+
+```text
+verificationMethod
+verificationStatus
+verifiedAt
+verificationImage
+attendanceSessionId
+```
+
+Use the existing naming conventions in the project.
+
+Do NOT duplicate fields that already exist.
+
+Example conceptual record:
+
+```text
+Employee:
+John Doe
+
+Clock In:
+8:04 AM
+
+Verification:
+Webcam
+
+Verification Status:
+Verified
+
+Verified At:
+8:04 AM
+```
+
+---
+
+# STEP 11 — EMPLOYER DASHBOARD
+
+Add webcam verification information to the employer's attendance view.
+
+For example:
+
+```text
+TODAY'S ATTENDANCE
+
+John Doe
+Present
+
+Clocked in:
+8:04 AM
+
+Verification:
+🟢 Webcam Verified
+
+[View Verification]
+```
+
+When the employer clicks:
+
+```text
+View Verification
+```
+
+show the captured verification image.
+
+Do NOT automatically expose verification images everywhere.
+
+Only authorized employer/admin roles should be able to access them.
+
+---
+
+# STEP 12 — ACCESS CONTROL
+
+Verification images must be protected.
+
+Do NOT make them publicly accessible through something like:
+
+```text
+/public/employee-images/
+```
+
+if that would expose private employee data.
+
+Use the application's existing authenticated file-access mechanism if one exists.
+
+If the project already uses private cloud storage, reuse it.
+
+If it stores files locally, ensure access is restricted through the backend.
+
+Only authorized users should be able to retrieve attendance verification images.
+
+---
+
+# STEP 13 — RETENTION
+
+Do not store verification images forever by default.
+
+Design the system so the retention period can eventually be configured.
+
+For example:
+
+```text
+Verification image retention:
+30 days
+60 days
+90 days
+```
+
+Do not automatically implement a destructive cleanup job unless the existing architecture supports scheduled jobs safely.
+
+At minimum, structure the feature so retention can be added later.
+
+---
+
+# STEP 14 — CLOCK-OUT
+
+Do NOT automatically require continuous webcam monitoring during the employee's workday.
+
+For the first version, webcam verification should happen during:
+
+```text
+CLOCK IN
+```
+
+Optionally support:
+
+```text
+CLOCK OUT
+```
+
+using the same verification mechanism.
+
+But do NOT make the employee keep their webcam enabled throughout the workday.
+
+---
+
+# STEP 15 — AUDIT LOG
+
+Every successful webcam verification should create an audit event if the EMS already has an audit-log system.
+
+Example:
+
+```text
+AUDIT LOG
+
+Employee:
+John Doe
+
+Action:
+Attendance Clock-In
+
+Verification:
+Webcam
+
+Status:
+Verified
+
+Time:
+8:04 AM
+```
+
+Also record failed verification attempts where appropriate.
+
+Do not store unnecessary sensitive information.
+
+---
+
+# STEP 16 — SECURITY AGAINST SIMPLE REPLAY
+
+The system should make it difficult to simply reuse an old verification.
+
+Consider binding the verification request to:
+
+* Current authenticated user
+* Current attendance session
+* Current verification attempt
+* Short expiration window
+* Server-generated challenge/nonce if appropriate
+
+The frontend should not be able to reuse an old successful verification request to create another attendance record.
+
+---
+
+# STEP 17 — UI/UX
+
+The UI should feel like a professional modern EMS.
+
+Do not create a generic AI-looking interface.
+
+Use the existing application's:
+
+* Colors
+* Typography
+* Spacing
+* Buttons
+* Cards
+* Modal system
+* Icons
+* Toast notifications
+
+The camera modal should clearly communicate each stage:
+
+```text
+Preparing camera...
+        ↓
+Camera ready
+        ↓
+Position your face
+        ↓
+Verification in progress...
+        ↓
+Verification successful
+        ↓
+Attendance recorded
+```
+
+Use clear success/error states.
+
+---
+
+# STEP 18 — IMPORTANT FAILURE CASES
+
+Handle all of these:
+
+### Camera denied
+
+Employee cannot complete webcam verification.
+
+### Camera disconnected
+
+Verification fails gracefully.
+
+### Another application is using the camera
+
+Show a useful error.
+
+### Employee closes modal
+
+Stop camera immediately.
+
+### Employee navigates away
+
+Stop camera immediately.
+
+### Verification fails
+
+Allow retry.
+
+### Attendance session expired
+
+Tell employee to request/scan the current session.
+
+### Employee already clocked in
+
+Do not create another attendance record.
+
+### Network failure
+
+Do not falsely show "Clocked In."
+
+### Backend failure
+
+Do not leave the employee thinking attendance was recorded.
+
+### Duplicate request
+
+Backend should prevent duplicate attendance.
+
+---
+
+# STEP 19 — TEST THE COMPLETE FLOW
+
+After implementation, test:
+
+## Test 1
+
+Employee clicks Clock In.
+
+Expected:
+
+```text
+Camera permission requested.
+```
+
+## Test 2
+
+Camera permission granted.
+
+Expected:
+
+```text
+Live camera preview appears.
+```
+
+## Test 3
+
+Employee completes verification.
+
+Expected:
+
+```text
+Verification successful.
+```
+
+## Test 4
+
+Attendance succeeds.
+
+Expected:
+
+```text
+Attendance record created.
+```
+
+## Test 5
+
+Camera stops.
+
+Expected:
+
+```text
+Webcam indicator turns off.
+```
+
+## Test 6
+
+Employee tries to clock in again.
+
+Expected:
+
+```text
+Already clocked in.
+```
+
+No duplicate record.
+
+## Test 7
+
+Camera permission denied.
+
+Expected:
+
+```text
+Clear error.
+No attendance created.
+```
+
+## Test 8
+
+Attendance session expired.
+
+Expected:
+
+```text
+Attendance rejected.
+No attendance record created.
+```
+
+## Test 9
+
+User tries to manipulate the frontend request.
+
+Expected:
+
+```text
+Backend rejects invalid/unverified attendance.
+```
+
+## Test 10
+
+Employer views attendance.
+
+Expected:
+
+```text
+Webcam Verified
+[View Verification]
+```
+
+Only authorized employer/admin users should have access to the verification image.
+
+---
+
+# STEP 20 — DO NOT BREAK EXISTING EMS FEATURES
+
+Before finishing, verify that these still work:
+
+* Employee login
+* Employer login
+* Employee creation
+* Employee deletion
+* Temporary password
+* Forced password change
+* Employee dashboard
+* Employer dashboard
+* Existing attendance
+* Clock-out
+* Break functionality
+* Notifications
+* Roles/permissions
+* Existing employee management
+
+If any existing feature breaks, fix it before declaring the task complete.
+
+---
+
+# FINAL REPORT
+
+After implementation, give me a concise report containing:
+
+1. What you discovered in the existing attendance architecture.
+2. Files you modified.
+3. How webcam verification works.
+4. Whether you added liveness detection and exactly how.
+5. How the backend validates verification.
+6. How verification images are protected.
+7. How the webcam is stopped after verification.
+8. How duplicate/replay attempts are handled.
+9. What tests you performed.
+10. Any dependency/package you added and why.
+11. Any configuration/environment variables I need to provide.
+12. Any limitations of the current implementation.
+
+## FINAL IMPORTANT INSTRUCTION
+
+Do not rebuild the EMS.
+
+Do not replace working authentication.
+
+Do not create continuous webcam surveillance.
+
+Do not secretly activate the employee's camera.
+
+The employee must explicitly initiate attendance verification and grant camera permission.
+
+The webcam should only be active for the short verification process and must be stopped immediately afterward.
+
+Inspect first → understand existing architecture → implement → test → report.
