@@ -108,6 +108,17 @@
     }
 }
 
+/* Smooth scrolling for the landing page's in-page anchor nav */
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 6px;

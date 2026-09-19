@@ -26,14 +26,19 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
     const url = isEditMode ? `/employees/${initialData.id}` : "/employees"
     const method = isEditMode ? "put" : "post"
 
-    await api[method](url, payload)
+    const { data } = await api[method](url, payload)
 
-    toast.success(isEditMode ? "Employee updated" : "Employee created")
-
-    onSuccess ? onSuccess() : navigate("/employee")
+    if (isEditMode) {
+      toast.success("Employee updated")
+      onSuccess ? onSuccess() : navigate("/employee")
+    } else {
+      // hand the generated temporary password back so the employer can copy it
+      onSuccess
+        ? onSuccess({ temporaryPassword: data.temporaryPassword, employee: data.employee })
+        : navigate("/employee")
+    }
 
   } catch (error) {
-    console.log(error.response) // 👈 VERY IMPORTANT (debug this)
     toast.error(error.response?.data?.error || error.message)
   } finally {
     setLoading(false)
@@ -205,13 +210,11 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
             />
           </div>
           {!isEditMode && (
-            <div >
-              <label className="block mb-2">Temporary Password</label>
-              <input
-                type="password"
-                name="password"
-                required
-              />
+            <div className="sm:col-span-2 flex items-start gap-2 rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-700">
+              <span>
+                A secure temporary password will be generated automatically and
+                shown to you once after the employee is created.
+              </span>
             </div>
           )}
 

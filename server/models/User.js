@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     role: {type: String, enum: ["ADMIN", "EMPLOYEE"], default:
         "EMPLOYEE"},
     isDisabled: {type: Boolean, default: false},
+    mustChangePassword: {type: Boolean, default: false},
     }, {timestamps:true })
     
 

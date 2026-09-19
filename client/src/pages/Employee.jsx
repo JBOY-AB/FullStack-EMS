@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Plus, Search, X } from 'lucide-react'
-import { dummyEmployeeData, DEPARTMENTS } from '../assets/assets'
+import { Plus, Search, Users, X } from 'lucide-react'
+import { DEPARTMENTS } from '../assets/assets'
 import EmployeeCard from '../components/EmployeeCard'
 import EmployeeForm from '../components/EmployeeForm'
+import EmployeeCreatedModal from '../components/EmployeeCreatedModal'
 import api from '../api/axios'
 
 const Employee = () => {
@@ -12,6 +13,7 @@ const Employee = () => {
   const [selectedDept, setSelectedDept] = useState('')
   const [editEmployee, setEditEmployee] = useState(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createdInfo, setCreatedInfo] = useState(null)
 
   const fetchEmployees = useCallback(async () => {
     try {
@@ -85,22 +87,39 @@ const Employee = () => {
         <div className='flex justify-center p-12'>
           <div className='animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full' />
         </div>
+      ) : employees.length === 0 ? (
+        // Empty state — no employees exist yet
+        <div className='text-center py-16 px-6 bg-white rounded-2xl border border-dashed border-slate-200'>
+          <div className='mx-auto w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center mb-4'>
+            <Users className='w-7 h-7 text-indigo-400' />
+          </div>
+          <h3 className='text-slate-900 font-semibold'>No employees yet</h3>
+          <p className='text-slate-500 text-sm mt-1 mb-6'>
+            Create your first employee to get started.
+          </p>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className='btn-primary inline-flex items-center gap-2'
+          >
+            <Plus size={16} />
+            Add Employee
+          </button>
+        </div>
+      ) : filtered.length === 0 ? (
+        // Employees exist but none match the current search/filter
+        <p className='text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200'>
+          No employees match your search
+        </p>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5'>
-          {filtered.length === 0 ? (
-            <p className='col-span-full text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200'>
-              No employee found
-            </p>
-          ) : (
-            filtered.map((emp) => (
-              <EmployeeCard
-                key={emp.id}
-                employee={emp}
-                onDelete={fetchEmployees}
-                onEdit={(employeeData) => setEditEmployee(employeeData)}
-              />
-            ))
-          )}
+          {filtered.map((emp) => (
+            <EmployeeCard
+              key={emp.id}
+              employee={emp}
+              onDelete={fetchEmployees}
+              onEdit={(employeeData) => setEditEmployee(employeeData)}
+            />
+          ))}
         </div>
       )}
 
@@ -136,8 +155,11 @@ const Employee = () => {
             {/* Modal Body */}
             <div className='p-6'>
               <EmployeeForm
-                onSuccess={() => {
+                onSuccess={(result) => {
                   setShowCreateModal(false);
+                  if (result?.temporaryPassword) {
+                    setCreatedInfo(result);
+                  }
                   fetchEmployees();
                 }} onCancel={() => setShowCreateModal(false)} />
             </div>
@@ -185,6 +207,14 @@ const Employee = () => {
           </div>
         </div>
       )}
+
+      {/* Employee Created — show the generated temporary password once */}
+      <EmployeeCreatedModal
+        open={!!createdInfo}
+        employee={createdInfo?.employee}
+        temporaryPassword={createdInfo?.temporaryPassword}
+        onClose={() => setCreatedInfo(null)}
+      />
     </div>
   )
 }

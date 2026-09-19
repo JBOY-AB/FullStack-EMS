@@ -3,6 +3,7 @@ import Attendance from "../models/Attendance.js";
 import Employee from "../models/Employee.js";
 import LeaveApplication from "../models/LeaveApplication.js";
 import sendEmail from "../config/nodemailer.js";
+import { VERIFICATION_IMAGE_RETENTION_DAYS } from "../constants/attendance.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "fullstack-ems" });
@@ -210,8 +211,39 @@ const attendanceReminderCron = inngest.createFunction(
 
 
 
+// cron : strip stored webcam verification images older than the retention
+// window. Non-destructive — the attendance record and its verification
+// metadata stay; only the image buffer is removed so nothing is over-retained.
+const verificationImageRetention = inngest.createFunction(
+  { id: "verification-image-retention", triggers: [
+    { cron: "TZ=Asia/Kolkata 0 3 * * *" }, // daily at 3:00 AM IST
+  ] },
+  async ({ step }) => {
+    const result = await step.run("strip-expired-verification-images", async () => {
+      const cutoff = new Date(
+        Date.now() - VERIFICATION_IMAGE_RETENTION_DAYS * 24 * 60 * 60 * 1000
+      );
+
+      const res = await Attendance.updateMany(
+        { hasVerificationImage: true, verifiedAt: { $lt: cutoff } },
+        {
+          $unset: { verificationImage: "", verificationImageType: "" },
+          $set: { hasVerificationImage: false },
+        }
+      );
+
+      return { cleared: res.modifiedCount || 0, cutoff: cutoff.toISOString() };
+    });
+
+    return result;
+  }
+);
+
+
+
 // Create an empty array where we'll export future Inngest functions
-export const functions = [autoCheckOut, 
+export const functions = [autoCheckOut,
     leaveApplicationReminder,
-     attendanceReminderCron
+     attendanceReminderCron,
+     verificationImageRetention
     ];

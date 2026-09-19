@@ -24,7 +24,10 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 app.use(cors());
-app.use(express.json());
+// Clock-in sends a downscaled webcam frame (data URL) alongside JSON, so the
+// body can exceed the 100 KB express default. Capped at 1 MB (image buffer is
+// hard-limited to 500 KB server-side; base64 inflates it by ~33%).
+app.use(express.json({ limit: "1mb" }));
 
 const upload = multer();
 

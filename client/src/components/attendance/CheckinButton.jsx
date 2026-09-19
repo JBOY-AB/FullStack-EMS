@@ -1,21 +1,33 @@
-import { Loader, Loader2Icon, LogInIcon, LogOutIcon } from 'lucide-react'
+import { Loader2Icon, LogInIcon, LogOutIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import api from '../../api/axios'
 import toast from 'react-hot-toast'
+import AttendanceVerificationModal from './AttendanceVerificationModal'
 
 const CheckinButton = ({ todayRecord, onAction }) => {
     const [loading, setLoading] = useState(false)
+    const [verifying, setVerifying] = useState(false)
 
+    const isCheckedIn = !!todayRecord?.checkIn;
 
-    const handleAttendance = async () => {
+    // Clock-out keeps the original one-click behaviour — webcam verification is
+    // a clock-in gate only, so nobody has to keep a camera handy all day.
+    const handleCheckOut = async () => {
         setLoading(true)
-       try {
-        await api.post("/attendance")
-        onAction()
-       } catch (error) {
-         toast.error(error.response?.data?.error || error?.message)
-       } 
-       setLoading(false)
+        try {
+            await api.post("/attendance")
+            onAction()
+        } catch (error) {
+            toast.error(error.response?.data?.error || error?.message)
+        }
+        setLoading(false)
+    }
+
+    // Clock-in no longer writes the record directly; the verification modal
+    // owns the camera → liveness → capture → submit sequence.
+    const handleAttendance = () => {
+        if (isCheckedIn) return handleCheckOut()
+        setVerifying(true)
     }
 
     if (todayRecord?.checkOut) {
@@ -32,28 +44,33 @@ const CheckinButton = ({ todayRecord, onAction }) => {
         )
     }
 
-    const isCheckedIn = !!todayRecord?.checkIn;
-
-
     return (
-        <div className='absolute bottom-4 right-4 flex flex-col z-1'>
-            <button
-                onClick={handleAttendance}
-                disabled={loading}
-                className={`w-full max-w-xs flex justify-between items-center gap-8 p-4 rounded-xl bg-linear-to-br text-white ${isCheckedIn
-                        ? "from-slate-700 to-slate-900"
-                        : "from-indigo-600 to-indigo-700"
-                    }`}
-            >
-                {loading ? <Loader2Icon className='size-7 animate-spin' /> : isCheckedIn ?
-                    <LogOutIcon className='size-7' /> : <LogInIcon className='size-7' />}
+        <>
+            <div className='absolute bottom-4 right-4 flex flex-col z-1'>
+                <button
+                    onClick={handleAttendance}
+                    disabled={loading}
+                    className={`w-full max-w-xs flex justify-between items-center gap-8 p-4 rounded-xl bg-linear-to-br text-white ${isCheckedIn
+                            ? "from-slate-700 to-slate-900"
+                            : "from-indigo-600 to-indigo-700"
+                        }`}
+                >
+                    {loading ? <Loader2Icon className='size-7 animate-spin' /> : isCheckedIn ?
+                        <LogOutIcon className='size-7' /> : <LogInIcon className='size-7' />}
 
-                <div  className='relative flex flex-col items-center text-center' >
-                    <h2 className='text-lg font-medium mb-1'>{loading ? "Processing..." : isCheckedIn ? "Clock Out" : "Clock In"}</h2>
-                    <p className='text-xs opacity-80'>{isCheckedIn ? "Click to end your shift" : "start your work day"}</p>
-                </div>
-            </button>
-        </div>
+                    <div className='relative flex flex-col items-center text-center' >
+                        <h2 className='text-lg font-medium mb-1'>{loading ? "Processing..." : isCheckedIn ? "Clock Out" : "Clock In"}</h2>
+                        <p className='text-xs opacity-80'>{isCheckedIn ? "Click to end your shift" : "Verify presence to start your work day"}</p>
+                    </div>
+                </button>
+            </div>
+
+            <AttendanceVerificationModal
+                open={verifying}
+                onClose={() => setVerifying(false)}
+                onSuccess={onAction}
+            />
+        </>
     )
 }
 

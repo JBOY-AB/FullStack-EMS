@@ -6,14 +6,14 @@ import toast from 'react-hot-toast'
 const EmployeeCard = ({ employee, onDelete, onEdit }) => {
 
   const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this employee?")) return
     try {
       await api.delete(`/employees/${employee.id}`)
+      toast.success("Employee deleted")
       onDelete()
     } catch (error) {
       toast.error(error.response?.data?.error || error.message)
     }
-    if (!confirm("Are you sure you want to delete this employee?")) return
-    onDelete(employee.id)
   }
 
   return (
@@ -30,36 +30,29 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
         </div>
       </div>
 
-      {/* Department / DELETED badge */}
+      {/* Department badge */}
       <div className='absolute top-3 left-3 flex gap-2'>
         <span className='bg-white/90 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-slate-600 rounded-lg shadow-sm'>
           {employee.department || "Remote"}
         </span>
-        {employee.isDeleted && (
-          <span className='bg-red-500/60 font-medium text-white px-2.5 py-1 text-xs rounded'>
-            DELETED
-          </span>
-        )}
       </div>
 
       {/* Hover action buttons */}
-      {!employee.isDeleted && (
-        <div className='absolute inset-0 bg-gradient-to-t from-indigo-700/20 via-transparent to-transparent opacity-0
-          group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6 gap-3'>
-          <button
-            onClick={() => onEdit(employee)}
-            className='transition-all hover:scale-105 p-2.5 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg'
-          >
-            <PencilIcon className='w-4 h-4 text-slate-700' />
-          </button>
-          <button
-            onClick={handleDelete}
-            className='p-2.5 bg-white/90 backdrop-blur-sm text-slate-700 hover:text-rose-600 rounded-xl shadow-lg transition-all hover:scale-105'
-          >
-            <Trash2Icon className='w-4 h-4' />
-          </button>
-        </div>
-      )}
+      <div className='absolute inset-0 bg-gradient-to-t from-indigo-700/20 via-transparent to-transparent opacity-0
+        group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6 gap-3'>
+        <button
+          onClick={() => onEdit(employee)}
+          className='transition-all hover:scale-105 p-2.5 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg'
+        >
+          <PencilIcon className='w-4 h-4 text-slate-700' />
+        </button>
+        <button
+          onClick={handleDelete}
+          className='p-2.5 bg-white/90 backdrop-blur-sm text-slate-700 hover:text-rose-600 rounded-xl shadow-lg transition-all hover:scale-105'
+        >
+          <Trash2Icon className='w-4 h-4' />
+        </button>
+      </div>
 
       {/* Name & position */}
       <div className='p-5 text-center'>

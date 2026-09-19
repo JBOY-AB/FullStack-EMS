@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken"
+import User from "../models/User.js";
 
 export const protect = (req,res, next)=> {
     try {
@@ -24,4 +25,22 @@ export const protectAdmin = (req, res, next)=> {
         return res.status(403).json({error: "Admin access required"})
     }
     next()
+}
+
+// Blocks access to normal functionality while the user still has a
+// temporary password. Enforced server-side so it can't be bypassed by
+// calling an endpoint directly. Must run after `protect`.
+export const requirePasswordChanged = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.session?.userId).select("mustChangePassword");
+        if (user?.mustChangePassword) {
+            return res.status(403).json({
+                error: "PASSWORD_CHANGE_REQUIRED",
+                mustChangePassword: true,
+            });
+        }
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
 }
