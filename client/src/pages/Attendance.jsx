@@ -1,16 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { dummyAttendanceData } from '../assets/assets'
 import Loading from '../components/Loading'
 import CheckinButton from '../components/attendance/CheckinButton'
 import AttendanceStats from '../components/attendance/AttendanceStats'
 import AttendanceHistory from '../components/attendance/AttendanceHistory'
+import AdminAttendance from '../components/attendance/AdminAttendance'
 import api from '../api/axios'
 import { toast } from 'react-hot-toast'
+import { useAuth } from '../context/AuthContext'
 
 const Attendance = () => {
+  const { user } = useAuth()
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(true)
   const [isDeleted, setIsDeleted] = useState(false)
+
+  const isAdmin = user?.role === "ADMIN"
 
   const fetchData = useCallback(async ()=>{
     try {
@@ -24,10 +28,14 @@ const Attendance = () => {
       setLoading(false)
     }
   },[])
-  
+
   useEffect(()=>{
+    // Admins have no employee record of their own — they get the employer view.
+    if(isAdmin) return
     fetchData()
-  },[fetchData])
+  },[fetchData, isAdmin])
+
+  if (isAdmin) return <AdminAttendance />
 
   if (loading) return <Loading />
 

@@ -28,7 +28,18 @@ const parseImageDataUrl = (dataUrl) => {
   return { mime, buffer };
 };
 
-// Audit logging must never block or fail attendance — swallow its errors.
+// Which client-side check ran: on-device face detection, or the motion-only
+// fallback used when the face model can't load.
+//
+// IMPORTANT: this is a CLIENT CLAIM. The server cannot confirm which check the
+// browser actually ran, just as it could never confirm the liveness check ran
+// at all. It is an operational/audit signal for the employer, NOT a security
+// control. The real server-side guarantees are unchanged: a single-use nonce,
+// a required image, and the attendance session code. Anything unrecognised is
+// treated as the weaker mode.
+const verificationStatusFor = (mode) => (mode === "face" ? "verified" : "verified_degraded");
+
+
 const logVerification = async ({ employee, session, status, reason = null, attendanceId = null }) => {
   try {
     await VerificationAuditLog.create({
@@ -91,7 +102,14 @@ export const clockInOut = async (req, res) => {
 
     // ===================== CHECK-IN (verified) =====================
     if (!existing) {
-      const { nonce, image, sessionCode } = req.body;
+      const { nonce, image, sessionCode, verificationMode } = req.body;
+
+      // 0) employee must be allowed to clock in at all. Checked on check-in
+      //    only, so someone deactivated mid-shift can still clock out.
+      if (employee.employmentStatus !== "ACTIVE") {
+        await logVerification({ employee, session, status: "failed", reason: "inactive_employee" });
+        return res.status(403).json({ error: "Your employment status does not allow clocking in." });
+      }
 
       // 1) valid, unused, unexpired verification challenge (replay protection)
       const challenge = nonce
@@ -136,6 +154,7 @@ export const clockInOut = async (req, res) => {
       await challenge.save();
 
       const isLate = now.getHours() >= 9 && now.getMinutes() > 0;
+      const verificationStatus = verificationStatusFor(verificationMode);
 
       let attendance;
       try {
@@ -145,7 +164,7 @@ export const clockInOut = async (req, res) => {
           checkIn: now,
           status: isLate ? "LATE" : "PRESENT",
           verificationMethod: "webcam",
-          verificationStatus: "verified",
+          verificationStatus,
           verifiedAt: now,
           verificationImage: parsed.buffer,
           verificationImageType: parsed.mime,
@@ -168,7 +187,7 @@ export const clockInOut = async (req, res) => {
       await logVerification({
         employee,
         session,
-        status: "verified",
+        status: verificationStatus,
         attendanceId: attendance._id,
       });
 

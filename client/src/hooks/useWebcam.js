@@ -14,6 +14,7 @@ const classifyError = (err) => {
   if (["NotAllowedError", "PermissionDeniedError", "SecurityError"].includes(name)) return "denied";
   if (["NotFoundError", "DevicesNotFoundError", "OverconstrainedError"].includes(name)) return "notfound";
   if (["NotReadableError", "TrackStartError", "AbortError"].includes(name)) return "inuse";
+  if (name === "NoFramesError") return "noframes";
   return "unknown";
 };
 
@@ -21,8 +22,28 @@ const ERROR_MESSAGES = {
   denied: "Camera access was blocked. Enable camera permission for this site, then try again.",
   notfound: "No camera was found on this device.",
   inuse: "Your camera is already in use by another app. Close it and try again.",
+  noframes: "Your camera started but isn't sending any video. Close any other app using it, then try again.",
   unknown: "Could not start the camera. Please try again.",
 };
+
+// Resolve once the element is actually decoding frames.
+//
+// This guard is the whole reason verification used to fail silently: a video
+// that never advances hands the liveness check identical frames forever, which
+// reads as "you didn't move" rather than "the camera never started". Frames
+// flowing — not play() resolving — is the real signal, so a rejected play()
+// (autoplay policy, interrupted load) is not by itself treated as failure.
+const waitForFrames = (video, timeoutMs = 5000) =>
+  new Promise((resolve) => {
+    if (!video) return resolve(false);
+    const start = Date.now();
+    const check = () => {
+      if (video.readyState >= 2 && video.videoWidth > 0) return resolve(true);
+      if (Date.now() - start >= timeoutMs) return resolve(false);
+      setTimeout(check, 50);
+    };
+    check();
+  });
 
 export const useWebcam = () => {
   const videoRef = useRef(null);
@@ -58,10 +79,19 @@ export const useWebcam = () => {
         audio: false,
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play().catch(() => {});
+
+      const video = videoRef.current;
+      if (video) {
+        video.srcObject = stream;
+        // May reject under autoplay policy even when playback then succeeds —
+        // waitForFrames below is the authoritative check.
+        await video.play().catch(() => {});
+
+        if (!(await waitForFrames(video))) {
+          throw Object.assign(new Error("no video frames"), { name: "NoFramesError" });
+        }
       }
+
       setStatus("live");
       return true;
     } catch (err) {

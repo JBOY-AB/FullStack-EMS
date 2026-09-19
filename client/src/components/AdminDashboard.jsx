@@ -1,5 +1,6 @@
-import { Building2Icon, CalendarIcon, FileTextIcon, UserIcon } from 'lucide-react'
+import { ArrowRightIcon, Building2Icon, CalendarIcon, FileTextIcon, UserIcon } from 'lucide-react'
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const AdminDashboard = ({ data }) => {
     console.log("Admin dashboard data:", data)
@@ -57,6 +58,22 @@ const AdminDashboard = ({ data }) => {
                         <s.icon className='size-10 p-2.5 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors duration-200' />
                     </div>
                 ))}
+            </div>
+
+            <div className='flex flex-col sm:flex-row gap-3'>
+                <Link
+                    to="/attendance"
+                    className='btn-primary text-center inline-flex items-center justify-center gap-2'
+                >
+                    Attendance & Verification <ArrowRightIcon className='w-4 h-4' />
+                </Link>
+
+                <Link
+                    to="/employees"
+                    className='btn-secondary text-center inline-flex items-center justify-center gap-2'
+                >
+                    Manage Employees <ArrowRightIcon className='w-4 h-4' />
+                </Link>
             </div>
         </div>
     )

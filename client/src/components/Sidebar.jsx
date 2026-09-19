@@ -40,9 +40,12 @@ const Sidebar = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutGridIcon },
-    role === 'ADMIN'
-      ? { name: 'Employees', path: '/employees', icon: UserIcon }
-      : { name: 'Attendance', path: '/attendance', icon: CalendarIcon },
+    // Admins manage employees; everyone gets Attendance — employees to clock
+    // in/out, admins to run the session and review today's verifications.
+    ...(role === 'ADMIN'
+      ? [{ name: 'Employees', path: '/employees', icon: UserIcon }]
+      : []),
+    { name: 'Attendance', path: '/attendance', icon: CalendarIcon },
     { name: 'Leave', path: '/leave', icon: FileTextIcon },
     { name: 'Payslips', path: '/payslips', icon: DollarSignIcon },
     { name: 'Settings', path: '/settings', icon: SettingsIcon },

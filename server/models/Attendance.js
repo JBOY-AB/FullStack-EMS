@@ -11,7 +11,10 @@ const attendanceSchema = new mongoose.Schema({
 
     // ----- Webcam attendance verification (attached at clock-in) -----
     verificationMethod: {type: String, enum: ["webcam", "manual", "none"], default: "none"},
-    verificationStatus: {type: String, enum: ["verified", "unverified", "failed"], default: "unverified"},
+    // "verified_degraded" = the browser could not load the face model and fell
+    // back to the motion-only check. Recorded so an employer can tell the two
+    // apart; it is a client-reported signal, NOT a server-enforced guarantee.
+    verificationStatus: {type: String, enum: ["verified", "verified_degraded", "unverified", "failed"], default: "unverified"},
     verifiedAt: {type: Date, default: null},
     // The captured frame is kept out of every default query (select:false) and
     // is only ever returned through the authenticated admin image endpoint.

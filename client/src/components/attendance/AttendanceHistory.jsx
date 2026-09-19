@@ -1,4 +1,5 @@
 import React from 'react'
+import { ShieldAlertIcon, ShieldCheckIcon } from 'lucide-react'
 import { getDayTypeDisplay, getWorkingHoursDisplay } from '../../assets/assets'
 import {format} from 'date-fns'
 
@@ -18,13 +19,14 @@ const AttendanceHistory = ({history}) => {
                     <th className='px-6 py-4'>Working Hours</th>
                     <th className='px-6 py-4'>Day Type</th>
                     <th className='px-6 py-4'>Status</th>
+                    <th className='px-6 py-4'>Verification</th>
                   </tr>
               </thead>
               <tbody>
                 {history.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className='text-center py-12 text-slate-400'>
-                      No records found 
+                    <td colSpan={7} className='text-center py-12 text-slate-400'>
+                      No records found
                     </td>
                   </tr>
                 ) :(
@@ -61,8 +63,27 @@ const AttendanceHistory = ({history}) => {
                                <span className={`badge ${record.status === "PRESENT" ? "badge-success" : record.status
                                 === "LATE" ? "badge-warning" : "badge-danger"
                                }`}>
-                                  {record.status}  
-                              </span> 
+                                  {record.status}
+                              </span>
+                              </td>
+
+                              <td className='px-6 py-4'>
+                                {record.verificationMethod === "webcam" && record.verificationStatus === "verified" ? (
+                                  <span className='badge badge-success inline-flex items-center gap-1.5'>
+                                    <ShieldCheckIcon className='w-3.5 h-3.5' />
+                                    Webcam
+                                  </span>
+                                ) : record.verificationMethod === "webcam" && record.verificationStatus === "verified_degraded" ? (
+                                  <span
+                                    title='Face detection was unavailable on this device; presence was confirmed by motion only.'
+                                    className='badge bg-amber-100 text-amber-700 inline-flex items-center gap-1.5'
+                                  >
+                                    <ShieldAlertIcon className='w-3.5 h-3.5' />
+                                    Motion
+                                  </span>
+                                ) : (
+                                  <span className='text-slate-400'>—</span>
+                                )}
                               </td>
                       </tr>
                     )

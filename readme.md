@@ -368,1127 +368,692 @@ The employer should have an easy way to copy the temporary password.
 
 When an employee logs in with their temporary password:
 
-```text
-Login
- ↓
-Authentication
- ↓
-Password-change requirement detected
- ↓
-Password Change Required modal/page
-```
 
-The employee should see a clear message explaining why the password must be changed.
 
-The UI should contain:
 
-```text
-New Password
-Confirm New Password
+# EMS PLATFORM — PUBLIC HOME / LANDING PAGE
 
-[Change Password]
-```
+I already have a working EMS (Employee Management System) application.
 
-Include proper validation.
+The existing authentication, employee management, attendance system, temporary-password flow, and other functionality are already implemented.
 
-At minimum:
-
-* Password cannot be empty.
-* Confirmation cannot be empty.
-* Passwords must match.
-* Apply any existing password requirements in the application.
-
-Do not weaken existing password security rules.
-
----
-
-# REQUIREMENT 10 — AFTER PASSWORD CHANGE
-
-After successfully changing the password:
-
-* Update `mustChangePassword` to false.
-* Update the authentication/user state.
-* Close the modal or navigate appropriately.
-* Allow the employee to continue to the normal employee dashboard.
-* Do not force the employee to change the password again on the next login.
-
-The new password should be the only password that works after the change.
-
-The old temporary password should no longer work.
-
----
-
-# REQUIREMENT 11 — DELETE EMPLOYEE BUG
-
-There is currently a problem where employees that I delete do not disappear correctly.
-
-Investigate this carefully.
-
-Trace:
-
-```text
-Delete button
-    ↓
-Frontend handler
-    ↓
-API request
-    ↓
-Backend route
-    ↓
-Controller
-    ↓
-Database delete operation
-    ↓
-API response
-    ↓
-Frontend state update/refetch
-    ↓
-Employee list
-```
-
-Find exactly where the flow breaks.
-
-Then fix it.
-
-After deleting an employee:
-
-```text
-Database → employee is gone
-Frontend → employee is removed from the list
-Counts → updated
-Dashboard → updated
-```
-
-Do not require a manual browser refresh to see the deletion.
-
----
-
-# REQUIREMENT 12 — EMPTY STATE
-
-Because all existing employees will be removed, make sure the employee list handles zero employees properly.
-
-Instead of a broken/blank table, show an appropriate empty state, for example:
-
-```text
-No employees yet
-
-Create your first employee to get started.
-
-[Add Employee]
-```
-
-Use the application's existing design language.
-
----
-
-# IMPORTANT IMPLEMENTATION RULES
-
-## DO NOT
-
-* Rebuild the project.
-* Replace the authentication system without a reason.
-* Replace the database technology.
-* Rewrite unrelated components.
-* Delete working functionality.
-* Create duplicate authentication systems.
-* Store passwords in plain text.
-* Only implement the temporary-password requirement on the frontend.
-* Hide employees instead of deleting them.
-* Hardcode temporary passwords.
-* Break existing roles/permissions.
-* Break the existing employer/admin dashboard.
-* Change unrelated UI unnecessarily.
-
-## DO
-
-* Inspect first.
-* Understand the current architecture.
-* Reuse existing utilities.
-* Reuse existing components.
-* Reuse existing authentication logic where possible.
-* Follow existing naming conventions.
-* Follow existing folder structure.
-* Keep the implementation clean and maintainable.
-* Make the smallest safe changes necessary.
-* Handle errors properly.
-* Validate API inputs.
-* Keep frontend and backend behavior synchronized.
-
----
-
-# STEP 13 — TEST EVERYTHING
-
-After implementation, test the complete flow.
-
-### Test 1 — Empty employee database
-
-Confirm:
-
-```text
-Employees = 0
-```
-
-and the UI displays the correct empty state.
-
-### Test 2 — Create employee
-
-Create a new employee.
-
-Confirm:
-
-* Employee is saved.
-* Temporary password is generated.
-* Password is NOT stored as plain text.
-* Employer can see/copy the temporary password.
-* `mustChangePassword` is true.
-
-### Test 3 — Employee login
-
-Use:
-
-```text
-Employee email
-+
-Temporary password
-```
-
-Confirm login succeeds.
-
-Confirm the password-change requirement appears immediately.
-
-### Test 4 — Attempt to bypass password change
-
-Try accessing normal employee functionality while:
-
-```text
-mustChangePassword = true
-```
-
-Confirm the employee cannot bypass the password-change requirement.
-
-### Test 5 — Change password
-
-Set a new password.
-
-Confirm:
-
-```text
-mustChangePassword = false
-```
-
-and the employee gets normal access.
-
-### Test 6 — Login again
-
-Log out.
-
-Login using the new password.
-
-Confirm the forced password-change screen does NOT appear again.
-
-### Test 7 — Old temporary password
-
-Try logging in with the old temporary password.
-
-Confirm it no longer works.
-
-### Test 8 — Delete employee
-
-Create an employee, then delete them.
-
-Confirm:
-
-* Database record is deleted.
-* Employee disappears immediately from the UI.
-* Employee count updates.
-* No manual browser refresh is required.
-
----
-
-# FINAL RESPONSE AFTER IMPLEMENTATION
-
-When you finish, do NOT just say "done."
-
-Give me a concise implementation summary containing:
-
-1. What you discovered during the frontend/backend inspection.
-2. The actual cause of the employee deletion problem.
-3. What files you changed.
-4. What was added/changed for temporary passwords.
-5. How the forced password-change flow works.
-6. How the backend prevents bypassing it.
-7. How you cleared the existing employees.
-8. What tests you ran and whether they passed.
-9. Any remaining issues or things I need to configure manually.
-
-**Most important:** Do not make assumptions about the codebase. Inspect `client` and `server` first, understand the existing flow, and then implement these requirements within the current architecture.
-
-
-# EMS FEATURE — LIVE WEBCAM ATTENDANCE VERIFICATION
-
-You are working on an existing EMS (Employee Management System) with an existing frontend and backend.
-
-The application is already functional.
-
-**DO NOT rebuild the EMS.**
-**DO NOT replace the existing authentication or attendance architecture unless absolutely necessary.**
-
-Your task is to first inspect the existing codebase and then add a secure **Live Webcam Attendance Verification** feature to the existing attendance system.
-
----
-
-# CORE IDEA
-
-When an employee wants to clock in, they should not simply click:
-
-```text
-Clock In
-```
-
-Instead, the employee should go through a short verification process:
-
-```text
-Employee clicks Clock In
-        ↓
-Attendance session is verified
-        ↓
-Webcam permission requested
-        ↓
-Camera opens
-        ↓
-Employee positions their face inside the camera frame
-        ↓
-System performs a basic live-person verification
-        ↓
-A verification image/frame is captured
-        ↓
-Employee confirms
-        ↓
-Backend validates the attendance request
-        ↓
-Attendance is recorded
-        ↓
-Camera immediately stops
-```
-
-The webcam should NOT remain active after verification.
-
-This is a one-time attendance verification feature, NOT continuous employee surveillance.
-
----
-
-# STEP 1 — INSPECT THE EXISTING PROJECT FIRST
-
-Before writing code, thoroughly inspect:
-
-## CLIENT
-
-Inspect:
-
-* Employee dashboard
-* Attendance page
-* Clock-in button
-* Clock-out button
-* Authentication state
-* Employee context/store
-* API services
-* Attendance API calls
-* Modal/dialog components
-* Toast/notification system
-* Existing permissions handling
-* Existing camera/media functionality, if any
-* Routing
-* Protected routes
-* Existing UI design system
-
-## SERVER
-
-Inspect:
-
-* Attendance routes
-* Attendance controllers
-* Attendance model/schema
-* Employee/User model
-* Authentication middleware
-* JWT/session implementation
-* Organization/company structure
-* Existing attendance validation
-* Database structure
-* File/image upload system, if any
-* Existing audit logging
-* Existing notification system
+I now want to make the EMS feel like a **real professional SaaS product**.
 
 ## IMPORTANT
 
-Trace the current attendance flow completely:
+Do NOT rebuild the application.
 
-```text
-Employee
-   ↓
-Frontend Clock-In
-   ↓
-API Request
-   ↓
-Authentication
-   ↓
-Attendance Controller
-   ↓
-Database
-   ↓
-Response
-   ↓
-Frontend State
-```
+Do NOT modify or break the existing authentication system.
 
-Understand this before making modifications.
+Do NOT modify the existing employee/employer login logic unless absolutely necessary for routing.
 
-Do not create a second attendance system.
+The main change in this task is:
+
+> When someone visits the main EMS URL, they should see a professional public HOME/LANDING PAGE instead of being immediately redirected to login.
 
 ---
 
-# STEP 2 — ATTENDANCE SESSION
+# CURRENT BEHAVIOR
 
-Integrate the webcam verification with the existing attendance system.
-
-If the EMS already has a dynamic QR/PIN attendance session, reuse it.
-
-If it does not yet exist, inspect the architecture and implement the minimum required session functionality.
-
-The employer should be able to start an attendance session.
-
-Conceptually:
+Currently:
 
 ```text
-EMPLOYER DASHBOARD
-
-Attendance Session
-
-[ Start Session ]
-
-Status:
-🟢 Active
-
-Today's Code:
-4829
-
-Expires in:
-00:27
+EMS URL
+    ↓
+Login Page
 ```
 
-The attendance code should expire automatically.
-
-Do not trust the frontend timer.
-
-The backend must determine whether the code/session is valid.
+I do NOT want that anymore.
 
 ---
 
-# STEP 3 — EMPLOYEE CLOCK-IN EXPERIENCE
+# NEW BEHAVIOR
 
-Change the existing clock-in experience.
-
-When the employee clicks:
+The new flow should be:
 
 ```text
-Clock In
-```
-
-do NOT immediately create the attendance record.
-
-Instead open a professional verification modal.
-
-Example:
-
-```text
-┌─────────────────────────────────────┐
-│        Attendance Verification      │
-│                                     │
-│   We need to verify your presence  │
-│   before recording your attendance. │
-│                                     │
-│          ┌───────────────┐          │
-│          │               │          │
-│          │   CAMERA      │          │
-│          │    PREVIEW    │          │
-│          │               │          │
-│          └───────────────┘          │
-│                                     │
-│   Position your face inside frame   │
-│                                     │
-│          [ Verify Presence ]        │
-└─────────────────────────────────────┘
-```
-
-Use the browser's standard camera API:
-
-```text
-navigator.mediaDevices.getUserMedia()
-```
-
-Request video access only when verification starts.
-
----
-
-# STEP 4 — CAMERA PERMISSION
-
-Handle camera permissions properly.
-
-Possible states:
-
-### Permission granted
-
-Show the live camera preview.
-
-### Permission denied
-
-Show:
-
-```text
-Camera access is required for attendance verification.
-
-Please allow camera access in your browser settings
-and try again.
-```
-
-Do NOT silently fail.
-
-### Camera unavailable
-
-Show an appropriate error:
-
-```text
-We couldn't access your camera.
-
-Please make sure:
-• Your webcam is connected
-• No other application is using it
-• Browser camera permission is enabled
-```
-
-Provide a retry button.
-
----
-
-# STEP 5 — LIVE PERSON VERIFICATION
-
-Implement a reasonable first version of liveness verification.
-
-The system should NOT simply capture a static image uploaded by the employee.
-
-The verification should happen from the live camera stream.
-
-For the first implementation, use a lightweight interaction such as:
-
-```text
-Look at the camera
-        ↓
-Blink once
-        ↓
-Turn your head slightly
-        ↓
-Verification complete
-```
-
-However, do not invent unreliable computer-vision logic yourself if the project does not already contain such functionality.
-
-First inspect whether the existing project has an appropriate face/liveness library.
-
-If a reliable browser-compatible library is required, use a well-maintained solution that works with the project's current frontend stack.
-
-Do not add an enormous machine-learning framework unnecessarily.
-
----
-
-# IMPORTANT SECURITY RULE
-
-Do NOT claim that basic webcam detection provides perfect identity verification.
-
-The goal of this feature is:
-
-**attendance presence verification**
-
-not:
-
-**government-grade biometric identity verification.**
-
-If actual face recognition is implemented, clearly separate:
-
-* face detection
-* liveness detection
-* face identity matching
-
-Do not pretend that detecting a face means the system has confirmed the employee's identity.
-
-The employee is already authenticated through the EMS account.
-
-The webcam provides an additional presence signal.
-
----
-
-# STEP 6 — CAPTURE VERIFICATION IMAGE
-
-Once the verification succeeds, capture a single frame from the live webcam.
-
-The frame should be associated with:
-
-* Employee ID
-* Attendance record ID
-* Organization/company ID
-* Date
-* Verification timestamp
-* Verification type
-* Verification status
-
-Example:
-
-```text
-verificationType: "webcam"
-verificationStatus: "verified"
-verifiedAt: <timestamp>
-```
-
-Do NOT store an entire video recording.
-
-Only capture what is necessary for attendance verification.
-
----
-
-# STEP 7 — PRIVACY
-
-This feature must NOT continuously monitor employees.
-
-After the verification succeeds:
-
-```text
-Camera stream
-     ↓
-STOP
-```
-
-Make sure all MediaStream tracks are stopped:
-
-```text
-track.stop()
-```
-
-The camera indicator should turn off immediately after verification.
-
-Also stop the camera when:
-
-* Modal closes
-* User cancels
-* User navigates away
-* Verification fails
-* Component unmounts
-
-Do not leave the webcam running in the background.
-
----
-
-# STEP 8 — SEND VERIFICATION TO BACKEND
-
-Do not trust the frontend to say:
-
-```text
-verificationStatus = verified
-```
-
-The backend must validate the attendance request.
-
-The request should contain the appropriate authentication credentials and verification information.
-
-Follow the project's existing API architecture.
-
-Conceptually:
-
-```text
-POST /attendance/clock-in
-```
-
-or whatever endpoint already exists.
-
-Do NOT create a duplicate endpoint if an existing attendance endpoint can be extended safely.
-
----
-
-# STEP 9 — BACKEND VALIDATION
-
-Before recording attendance, validate:
-
-### 1. User authentication
-
-Is the employee authenticated?
-
-### 2. Employee status
-
-Is the employee allowed to clock in?
-
-### 3. Attendance session
-
-Is there an active attendance session?
-
-### 4. Session code
-
-If dynamic QR/PIN is being used, is the code/session valid?
-
-### 5. Expiration
-
-Has the attendance session expired?
-
-### 6. Duplicate attendance
-
-Has this employee already clocked in today?
-
-### 7. Verification
-
-Was the webcam verification completed through the expected flow?
-
-### 8. Organization
-
-Does the attendance session belong to the employee's organization?
-
-Only after these validations should the attendance record be created.
-
----
-
-# STEP 10 — ATTENDANCE RECORD
-
-Extend the existing attendance record only as necessary.
-
-Possible fields:
-
-```text
-verificationMethod
-verificationStatus
-verifiedAt
-verificationImage
-attendanceSessionId
-```
-
-Use the existing naming conventions in the project.
-
-Do NOT duplicate fields that already exist.
-
-Example conceptual record:
-
-```text
-Employee:
-John Doe
-
-Clock In:
-8:04 AM
-
-Verification:
-Webcam
-
-Verification Status:
-Verified
-
-Verified At:
-8:04 AM
+EMS URL
+    ↓
+PUBLIC HOME PAGE
+    ↓
+User learns about the EMS
+    ↓
+User clicks "Get Started" / "Sign In"
+    ↓
+LOGIN SELECTION
+    ↓
+┌───────────────────────┐
+│                       │
+│  Employer / Admin     │
+│  Login                │
+│                       │
+└───────────────────────┘
+
+┌───────────────────────┐
+│                       │
+│  Employee             │
+│  Login                │
+│                       │
+└───────────────────────┘
 ```
 
 ---
 
-# STEP 11 — EMPLOYER DASHBOARD
+# STEP 1 — INSPECT THE CURRENT ROUTING
 
-Add webcam verification information to the employer's attendance view.
+Before changing anything, inspect the entire frontend routing system.
+
+Determine:
+
+* Current root route
+* Current login route
+* Employer/admin login route
+* Employee login route
+* Protected routes
+* Dashboard routes
+* Authentication redirects
+* Middleware
+* Route guards
+* Existing navigation components
+
+Do NOT guess.
+
+Understand exactly how the current routing works before modifying it.
+
+---
+
+# STEP 2 — CREATE THE PUBLIC HOME PAGE
+
+The root URL should become the public EMS landing page.
 
 For example:
 
 ```text
-TODAY'S ATTENDANCE
-
-John Doe
-Present
-
-Clocked in:
-8:04 AM
-
-Verification:
-🟢 Webcam Verified
-
-[View Verification]
+/
 ```
 
-When the employer clicks:
+should display:
 
 ```text
-View Verification
+EMS Home
 ```
 
-show the captured verification image.
+instead of:
 
-Do NOT automatically expose verification images everywhere.
+```text
+/login
+```
 
-Only authorized employer/admin roles should be able to access them.
+The homepage must be accessible without authentication.
 
 ---
 
-# STEP 12 — ACCESS CONTROL
+# DESIGN DIRECTION
 
-Verification images must be protected.
+I want the homepage to feel like a **modern professional SaaS product**, not a generic template.
 
-Do NOT make them publicly accessible through something like:
+It should look polished enough that if someone visits the EMS URL for the first time, they immediately understand:
 
-```text
-/public/employee-images/
-```
+* What the product is
+* Who it is for
+* What problem it solves
+* Why it is useful
+* How attendance works
+* How employees and employers interact with it
 
-if that would expose private employee data.
+Do NOT make it look like an AI-generated template.
 
-Use the application's existing authenticated file-access mechanism if one exists.
+Use the existing application's design system where possible.
 
-If the project already uses private cloud storage, reuse it.
-
-If it stores files locally, ensure access is restricted through the backend.
-
-Only authorized users should be able to retrieve attendance verification images.
-
----
-
-# STEP 13 — RETENTION
-
-Do not store verification images forever by default.
-
-Design the system so the retention period can eventually be configured.
-
-For example:
-
-```text
-Verification image retention:
-30 days
-60 days
-90 days
-```
-
-Do not automatically implement a destructive cleanup job unless the existing architecture supports scheduled jobs safely.
-
-At minimum, structure the feature so retention can be added later.
-
----
-
-# STEP 14 — CLOCK-OUT
-
-Do NOT automatically require continuous webcam monitoring during the employee's workday.
-
-For the first version, webcam verification should happen during:
-
-```text
-CLOCK IN
-```
-
-Optionally support:
-
-```text
-CLOCK OUT
-```
-
-using the same verification mechanism.
-
-But do NOT make the employee keep their webcam enabled throughout the workday.
-
----
-
-# STEP 15 — AUDIT LOG
-
-Every successful webcam verification should create an audit event if the EMS already has an audit-log system.
-
-Example:
-
-```text
-AUDIT LOG
-
-Employee:
-John Doe
-
-Action:
-Attendance Clock-In
-
-Verification:
-Webcam
-
-Status:
-Verified
-
-Time:
-8:04 AM
-```
-
-Also record failed verification attempts where appropriate.
-
-Do not store unnecessary sensitive information.
-
----
-
-# STEP 16 — SECURITY AGAINST SIMPLE REPLAY
-
-The system should make it difficult to simply reuse an old verification.
-
-Consider binding the verification request to:
-
-* Current authenticated user
-* Current attendance session
-* Current verification attempt
-* Short expiration window
-* Server-generated challenge/nonce if appropriate
-
-The frontend should not be able to reuse an old successful verification request to create another attendance record.
-
----
-
-# STEP 17 — UI/UX
-
-The UI should feel like a professional modern EMS.
-
-Do not create a generic AI-looking interface.
-
-Use the existing application's:
+Inspect the existing:
 
 * Colors
 * Typography
-* Spacing
 * Buttons
 * Cards
-* Modal system
+* Shadows
+* Border radius
 * Icons
-* Toast notifications
+* Animations
 
-The camera modal should clearly communicate each stage:
-
-```text
-Preparing camera...
-        ↓
-Camera ready
-        ↓
-Position your face
-        ↓
-Verification in progress...
-        ↓
-Verification successful
-        ↓
-Attendance recorded
-```
-
-Use clear success/error states.
+and maintain visual consistency.
 
 ---
 
-# STEP 18 — IMPORTANT FAILURE CASES
+# SECTION 1 — NAVBAR
 
-Handle all of these:
+Create a professional navigation bar.
 
-### Camera denied
+Possible structure:
 
-Employee cannot complete webcam verification.
+```text
+[ EMS LOGO ]
 
-### Camera disconnected
+Home
+Features
+How It Works
+Security
+About
 
-Verification fails gracefully.
+                         [ Sign In ]
+```
 
-### Another application is using the camera
+The navigation should be responsive.
 
-Show a useful error.
+On mobile, use an appropriate mobile menu.
 
-### Employee closes modal
-
-Stop camera immediately.
-
-### Employee navigates away
-
-Stop camera immediately.
-
-### Verification fails
-
-Allow retry.
-
-### Attendance session expired
-
-Tell employee to request/scan the current session.
-
-### Employee already clocked in
-
-Do not create another attendance record.
-
-### Network failure
-
-Do not falsely show "Clocked In."
-
-### Backend failure
-
-Do not leave the employee thinking attendance was recorded.
-
-### Duplicate request
-
-Backend should prevent duplicate attendance.
+The logo/brand should link back to `/`.
 
 ---
 
-# STEP 19 — TEST THE COMPLETE FLOW
+# SECTION 2 — HERO
 
-After implementation, test:
+The hero should immediately explain the product.
 
-## Test 1
-
-Employee clicks Clock In.
-
-Expected:
+Conceptually:
 
 ```text
-Camera permission requested.
+Modern Employee Management,
+Built for Better Workplaces.
+
+Manage employees, attendance,
+tasks and workforce activity from
+one secure platform.
+
+[ Get Started ]
+[ Explore Features ]
+
+                         [ EMS Dashboard Visual ]
 ```
 
-## Test 2
+Do not blindly copy this exact wording if you can improve it.
 
-Camera permission granted.
+The copy should be concise and professional.
 
-Expected:
-
-```text
-Live camera preview appears.
-```
-
-## Test 3
-
-Employee completes verification.
-
-Expected:
-
-```text
-Verification successful.
-```
-
-## Test 4
-
-Attendance succeeds.
-
-Expected:
-
-```text
-Attendance record created.
-```
-
-## Test 5
-
-Camera stops.
-
-Expected:
-
-```text
-Webcam indicator turns off.
-```
-
-## Test 6
-
-Employee tries to clock in again.
-
-Expected:
-
-```text
-Already clocked in.
-```
-
-No duplicate record.
-
-## Test 7
-
-Camera permission denied.
-
-Expected:
-
-```text
-Clear error.
-No attendance created.
-```
-
-## Test 8
-
-Attendance session expired.
-
-Expected:
-
-```text
-Attendance rejected.
-No attendance record created.
-```
-
-## Test 9
-
-User tries to manipulate the frontend request.
-
-Expected:
-
-```text
-Backend rejects invalid/unverified attendance.
-```
-
-## Test 10
-
-Employer views attendance.
-
-Expected:
-
-```text
-Webcam Verified
-[View Verification]
-```
-
-Only authorized employer/admin users should have access to the verification image.
+Avoid exaggerated marketing claims.
 
 ---
 
-# STEP 20 — DO NOT BREAK EXISTING EMS FEATURES
+# HERO VISUAL
 
-Before finishing, verify that these still work:
+Create a polished visual representing the EMS dashboard.
 
-* Employee login
-* Employer login
-* Employee creation
-* Employee deletion
-* Temporary password
+Possible visual:
+
+```text
+┌────────────────────────────────────────┐
+│ EMS Dashboard                          │
+│                                        │
+│ Employees     Present     Attendance   │
+│    42            35          83%       │
+│                                        │
+│ Today's Attendance                     │
+│                                        │
+│ John Doe       Present      8:03 AM    │
+│ Sarah Smith    Present      8:07 AM    │
+│ David Brown    Break        12:01 PM   │
+└────────────────────────────────────────┘
+```
+
+This can be a carefully designed UI mockup built with existing frontend components.
+
+Do not use a random stock image if a native UI mockup can look better.
+
+---
+
+# SECTION 3 — WHAT THE EMS DOES
+
+Create a section explaining the core product.
+
+Example:
+
+```text
+Everything your workplace needs,
+in one place.
+
+Employee Management
+Manage employee profiles, roles and access.
+
+Attendance
+Track clock-ins, clock-outs and breaks.
+
+Workforce Visibility
+Understand attendance and activity.
+
+Secure Access
+Role-based access keeps information protected.
+```
+
+Use attractive cards with icons.
+
+---
+
+# SECTION 4 — ATTENDANCE FEATURE
+
+This should be one of the major sections because attendance is an important part of this EMS.
+
+Explain the attendance process visually.
+
+For example:
+
+```text
+01
+Start Attendance
+Employer opens an attendance session.
+
+        ↓
+
+02
+Employee Verification
+Employee verifies their presence.
+
+        ↓
+
+03
+Clock In
+Attendance is securely recorded.
+
+        ↓
+
+04
+Work
+Employee continues their workday.
+
+        ↓
+
+05
+Clock Out
+Workday is completed and recorded.
+```
+
+Keep the explanation simple.
+
+---
+
+# SECTION 5 — SECURITY
+
+Create a section explaining the security features that already exist in the application.
+
+Only mention features that are actually implemented.
+
+For example, if currently implemented:
+
+* Secure authentication
+* Role-based access
+* Temporary employee passwords
 * Forced password change
-* Employee dashboard
-* Employer dashboard
-* Existing attendance
-* Clock-out
-* Break functionality
-* Notifications
-* Roles/permissions
-* Existing employee management
+* Attendance verification
+* Audit records
+* Protected employee information
 
-If any existing feature breaks, fix it before declaring the task complete.
+Do NOT advertise features that do not actually exist.
+
+Before writing this section, inspect the codebase and determine what security features are actually implemented.
+
+---
+
+# SECTION 6 — EMPLOYER EXPERIENCE
+
+Explain what an employer/admin can do.
+
+Example:
+
+```text
+For Employers
+
+Manage your workforce from a single dashboard.
+
+✓ Add employees
+✓ Manage employee accounts
+✓ Monitor attendance
+✓ Review attendance records
+✓ Manage employee access
+✓ View workforce information
+```
+
+Only include functionality that actually exists.
+
+---
+
+# SECTION 7 — EMPLOYEE EXPERIENCE
+
+Explain the employee side.
+
+Example:
+
+```text
+For Employees
+
+A simple way to manage your workday.
+
+✓ Secure login
+✓ Clock in and out
+✓ Manage attendance
+✓ View your work information
+✓ Receive notifications
+✓ Update your account
+```
+
+Again, only include features that actually exist.
+
+---
+
+# SECTION 8 — HOW IT WORKS
+
+Create a simple three- or four-step section.
+
+For example:
+
+```text
+01
+Create your workforce
+
+02
+Employees receive secure access
+
+03
+Track attendance and work activity
+
+04
+Manage everything from one dashboard
+```
+
+Make this visually interesting.
+
+---
+
+# SECTION 9 — CALL TO ACTION
+
+Near the bottom of the page:
+
+```text
+Ready to manage your workforce better?
+
+Start using EMS today.
+
+[ Get Started ]
+```
+
+The button should take the user to the login selection screen.
+
+---
+
+# STEP 10 — LOGIN SELECTION PAGE
+
+Create a clean page/interface where users choose how they want to sign in.
+
+For example:
+
+```text
+Welcome to EMS
+
+Choose how you want to continue.
+
+┌─────────────────────────────┐
+│                             │
+│       Employer / Admin      │
+│                             │
+│ Manage employees,           │
+│ attendance and workforce.   │
+│                             │
+│ [ Employer Login ]           │
+│                             │
+└─────────────────────────────┘
+
+
+┌─────────────────────────────┐
+│                             │
+│          Employee           │
+│                             │
+│ Access your account,        │
+│ attendance and work tools.  │
+│                             │
+│ [ Employee Login ]           │
+│                             │
+└─────────────────────────────┘
+```
+
+This should be visually polished.
+
+Do NOT create duplicate authentication forms.
+
+The buttons should simply route to the existing login pages.
+
+For example, conceptually:
+
+```text
+Employer Login
+      ↓
+existing employer/admin login
+
+Employee Login
+      ↓
+existing employee login
+```
+
+Use the actual routes discovered during your inspection.
+
+---
+
+# STEP 11 — ROUTING RULES
+
+Implement the routing carefully.
+
+Desired behavior:
+
+### Unauthenticated visitor
+
+```text
+/
+↓
+Public Home
+```
+
+### Visitor clicks Get Started
+
+```text
+/login
+```
+
+or an appropriate login-selection route.
+
+### Visitor chooses Employer
+
+```text
+Existing Employer Login
+```
+
+### Visitor chooses Employee
+
+```text
+Existing Employee Login
+```
+
+### Authenticated employer
+
+Keep existing behavior.
+
+### Authenticated employee
+
+Keep existing behavior.
+
+Do NOT break protected routes.
+
+---
+
+# STEP 12 — RESPONSIVE DESIGN
+
+The landing page must work properly on:
+
+* Desktop
+* Laptop
+* Tablet
+* Mobile
+
+Pay particular attention to:
+
+* Navbar
+* Hero
+* Dashboard visual
+* Feature cards
+* CTA buttons
+* Login-selection cards
+
+No horizontal overflow.
+
+---
+
+# STEP 13 — ANIMATIONS
+
+Use subtle professional animations where the existing stack supports them.
+
+Examples:
+
+* Fade-in
+* Slide-up
+* Hover effects
+* Dashboard card movement
+* Section reveal
+* Button transitions
+
+Do NOT over-animate the page.
+
+The goal is:
+
+```text
+Professional
+Modern
+Smooth
+Clean
+```
+
+not:
+
+```text
+Everything moving everywhere
+```
+
+Reuse existing animation libraries if already installed.
+
+Do not add a large dependency unnecessarily.
+
+---
+
+# STEP 14 — ACCESSIBILITY
+
+Make sure:
+
+* Buttons have meaningful labels.
+* Navigation works with keyboard.
+* Images have appropriate alt text.
+* Color contrast is reasonable.
+* Focus states are visible.
+* Mobile navigation is usable.
+
+---
+
+# STEP 15 — SEO / PAGE METADATA
+
+Inspect the current framework and metadata setup.
+
+Update the public home page metadata appropriately.
+
+Use a professional title such as:
+
+```text
+EMS — Employee Management System
+```
+
+and a description explaining the product.
+
+Do not remove existing useful metadata from the application.
+
+---
+
+# STEP 16 — DO NOT INVENT FEATURES
+
+This is extremely important.
+
+Before writing marketing copy, inspect the application.
+
+Do not say:
+
+"AI-powered workforce analytics"
+
+if there is no AI system.
+
+Do not say:
+
+"Biometric facial recognition"
+
+if there is no facial recognition.
+
+Do not say:
+
+"Real-time productivity monitoring"
+
+if that functionality does not exist.
+
+The landing page must accurately represent the current product.
+
+---
+
+# STEP 17 — KEEP EXISTING FUNCTIONALITY INTACT
+
+After implementing the landing page, verify:
+
+* Employer login still works.
+* Employee login still works.
+* Employee creation still works.
+* Employee deletion still works.
+* Temporary password flow still works.
+* Forced password change still works.
+* Attendance still works.
+* Clock-in still works.
+* Clock-out still works.
+* Employer dashboard still works.
+* Employee dashboard still works.
+* Protected routes still work.
+* Logout still works.
+
+---
+
+# STEP 18 — FINAL QUALITY CHECK
+
+Before finishing:
+
+1. Run the application.
+2. Open the root URL.
+3. Confirm the public home page appears.
+4. Click every navigation link.
+5. Click Get Started.
+6. Confirm login-selection page appears.
+7. Test Employer Login navigation.
+8. Test Employee Login navigation.
+9. Test authenticated routes.
+10. Test mobile layout.
+11. Check browser console for errors.
+12. Check network requests for unexpected failures.
 
 ---
 
 # FINAL REPORT
 
-After implementation, give me a concise report containing:
+When finished, tell me:
 
-1. What you discovered in the existing attendance architecture.
-2. Files you modified.
-3. How webcam verification works.
-4. Whether you added liveness detection and exactly how.
-5. How the backend validates verification.
-6. How verification images are protected.
-7. How the webcam is stopped after verification.
-8. How duplicate/replay attempts are handled.
-9. What tests you performed.
-10. Any dependency/package you added and why.
-11. Any configuration/environment variables I need to provide.
-12. Any limitations of the current implementation.
+1. What the previous routing flow was.
+2. What routing flow you changed it to.
+3. What files you created/modified.
+4. What sections you added to the home page.
+5. What login-selection route you created.
+6. Which existing login routes are being reused.
+7. Whether any existing functionality was changed.
+8. What tests you performed.
+9. Any issues or configuration I need to handle manually.
 
-## FINAL IMPORTANT INSTRUCTION
+Again:
 
-Do not rebuild the EMS.
-
-Do not replace working authentication.
-
-Do not create continuous webcam surveillance.
-
-Do not secretly activate the employee's camera.
-
-The employee must explicitly initiate attendance verification and grant camera permission.
-
-The webcam should only be active for the short verification process and must be stopped immediately afterward.
-
-Inspect first → understand existing architecture → implement → test → report.
+**Inspect first.**
+**Preserve the existing EMS.**
+**Build the public landing page around the existing product.**
+**Do not rebuild authentication.**

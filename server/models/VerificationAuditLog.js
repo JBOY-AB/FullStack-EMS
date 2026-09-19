@@ -9,7 +9,7 @@ const verificationAuditLogSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     action: { type: String, default: "CLOCK_IN" },
     verificationMethod: { type: String, default: "webcam" },
-    status: { type: String, enum: ["verified", "failed"], required: true },
+    status: { type: String, enum: ["verified", "verified_degraded", "failed"], required: true },
     reason: { type: String, default: null }, // failure reason, when status === "failed"
     attendanceId: { type: mongoose.Schema.Types.ObjectId, ref: "Attendance", default: null },
   },
