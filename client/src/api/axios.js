@@ -1,7 +1,11 @@
 import axios from "axios";
 
+const configuredBaseUrl = import.meta.env.VITE_BASE_URL?.trim();
+
 const api = axios.create({
-    baseURL: (import.meta.env.VITE_BASE_URL || "http://localhost:4000") + "/api"
+    // Vercel builds must provide the deployed server URL. Relative /api keeps
+    // same-domain deployments working without sending production requests to localhost.
+    baseURL: configuredBaseUrl ? `${configuredBaseUrl.replace(/\/$/, "")}/api` : "/api"
 })
 
 // Attach Auth token to all network requests

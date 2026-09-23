@@ -1,5 +1,12 @@
 # React + Vite
 
+## Deployment
+
+Set `VITE_BASE_URL` in the Vercel project running the client to the public URL
+of the deployed server, for example `https://your-server.vercel.app`.
+Vite embeds this value during the build, so redeploy the client after changing
+the environment variable. Do not include `/api` in the value.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
