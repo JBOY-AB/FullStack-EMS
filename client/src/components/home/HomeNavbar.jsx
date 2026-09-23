@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRightIcon, MenuIcon, UsersIcon, XIcon } from 'lucide-react'
+import { ArrowRightIcon, MenuIcon, XIcon } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import BrandLogo from '../BrandLogo'
 
 const NAV_LINKS = [
     { label: 'Home', href: '#top' },
@@ -44,17 +45,9 @@ const HomeNavbar = () => {
         <Link
             to='/'
             onClick={() => setOpen(false)}
-            className='flex items-center gap-2.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40'
+            className='rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500/40'
         >
-            <span className='w-9 h-9 rounded-lg bg-linear-to-br from-indigo-600 to-indigo-500 flex items-center justify-center shadow-md shadow-indigo-500/25'>
-                <UsersIcon className='w-[18px] h-[18px] text-white' />
-            </span>
-            <span className='leading-tight'>
-                <span className='block text-[15px] font-semibold text-slate-900 tracking-tight'>
-                    QuickEMS
-                </span>
-                <span className='block text-[11px] text-slate-500'>Employee Management</span>
-            </span>
+            <BrandLogo variant='full' />
         </Link>
     )
 
@@ -78,7 +71,7 @@ const HomeNavbar = () => {
                         <li key={link.href}>
                             <a
                                 href={link.href}
-                                className='px-3 py-2 rounded-md text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40'
+                                className='px-3 py-2 rounded-md text-[13px] font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500/40'
                             >
                                 {link.label}
                             </a>
@@ -89,7 +82,7 @@ const HomeNavbar = () => {
                 <div className='flex items-center gap-2'>
                     <Link
                         to={cta.to}
-                        className='hidden sm:inline-flex btn-primary items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40'
+                        className='hidden sm:inline-flex btn-primary items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500/40'
                     >
                         {cta.label}
                         <ArrowRightIcon className='w-4 h-4' aria-hidden='true' />
@@ -101,7 +94,7 @@ const HomeNavbar = () => {
                         aria-expanded={open}
                         aria-controls='mobile-menu'
                         aria-label='Open menu'
-                        className='lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40'
+                        className='lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500/40'
                     >
                         <MenuIcon className='w-5 h-5' />
                     </button>
@@ -126,7 +119,7 @@ const HomeNavbar = () => {
                                 type='button'
                                 onClick={() => setOpen(false)}
                                 aria-label='Close menu'
-                                className='p-2 rounded-md text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40'
+                                className='p-2 rounded-md text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500/40'
                             >
                                 <XIcon className='w-5 h-5' />
                             </button>
@@ -138,7 +131,7 @@ const HomeNavbar = () => {
                                     <a
                                         href={link.href}
                                         onClick={() => setOpen(false)}
-                                        className='block px-3 py-3 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40'
+                                        className='block px-3 py-3 rounded-md text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-navy-500/40'
                                     >
                                         {link.label}
                                     </a>

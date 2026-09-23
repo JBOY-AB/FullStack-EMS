@@ -22,8 +22,8 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
       <div className='relative aspect-4/3 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50'>
         <div className='w-full h-full flex items-center justify-center'>
           {/* circle icon */}
-          <div className='w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-slate-100 flex items-center justify-center shadow-md'>
-            <span className='text-2xl font-medium text-indigo-400'>
+          <div className='w-20 h-20 rounded-full bg-gradient-to-br from-navy-100 to-slate-100 flex items-center justify-center shadow-md'>
+            <span className='text-2xl font-medium text-navy-400'>
               {employee.firstName?.[0]}{employee.lastName?.[0]}
             </span>
           </div>
@@ -38,7 +38,7 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
       </div>
 
       {/* Hover action buttons */}
-      <div className='absolute inset-0 bg-gradient-to-t from-indigo-700/20 via-transparent to-transparent opacity-0
+      <div className='absolute inset-0 bg-gradient-to-t from-navy-700/20 via-transparent to-transparent opacity-0
         group-hover:opacity-100 transition-opacity flex items-end justify-center pb-6 gap-3'>
         <button
           onClick={() => onEdit(employee)}

@@ -411,7 +411,7 @@ const AttendanceVerificationModal = ({ open, onClose, onSuccess }) => {
                                                 ? "border-white/70"
                                                 : gates.faceFound
                                                     ? "border-emerald-400"
-                                                    : "border-indigo-400"
+                                                    : "border-navy-400"
                                         }`}
                                     />
                                 </div>
@@ -436,7 +436,7 @@ const AttendanceVerificationModal = ({ open, onClose, onSuccess }) => {
                                 {stage === "checking" && (
                                     <div className='absolute left-0 right-0 bottom-0 h-1 bg-white/20'>
                                         <div
-                                            className='h-full bg-indigo-400 transition-all duration-150'
+                                            className='h-full bg-navy-400 transition-all duration-150'
                                             style={{ width: `${Math.round(progress * 100)}%` }}
                                         />
                                     </div>
@@ -512,7 +512,7 @@ const AttendanceVerificationModal = ({ open, onClose, onSuccess }) => {
                     {/* ---------- Submitting ---------- */}
                     {stage === "submitting" && (
                         <div className='flex flex-col items-center text-center py-10 rounded-xl bg-slate-50 border border-slate-200'>
-                            <Loader2Icon className='w-7 h-7 text-indigo-500 animate-spin' />
+                            <Loader2Icon className='w-7 h-7 text-navy-500 animate-spin' />
                             <p className='text-sm font-medium text-slate-900 mt-3'>
                                 Recording attendance...
                             </p>

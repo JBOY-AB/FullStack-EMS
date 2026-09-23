@@ -8,7 +8,8 @@
     "server": "nodemon server.js",
     "start": "node server.js",
     "seed": "node seed.js",
-    "clear-employees": "node clearEmployees.js"
+    "clear-employees": "node clearEmployees.js",
+    "clear-leave-payslips": "node clearLeaveAndPayslips.js"
   },
   "keywords": [],
   "author": "",

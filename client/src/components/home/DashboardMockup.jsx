@@ -1,4 +1,5 @@
 import { Building2Icon, CalendarCheckIcon, FileTextIcon, ShieldCheckIcon, UsersIcon } from 'lucide-react'
+import { ACADEMY_NAME } from '../../constants/brand'
 
 // A native UI mockup of the real admin dashboard — same stat cards, same badge
 // styles, same table treatment as the signed-in app. Deliberately not a stock
@@ -24,13 +25,13 @@ const DashboardMockup = () => {
     return (
         <div
             role='img'
-            aria-label='Illustration of the QuickEMS admin dashboard, showing employee headcount, departments, today’s attendance and pending leaves above a table of today’s check-ins with their verification status.'
+            aria-label={`Illustration of the ${ACADEMY_NAME} admin dashboard, showing staff headcount, departments, today’s attendance and pending leaves above a table of today’s check-ins with their verification status.`}
             className='relative'
         >
             {/* soft glow behind the panel */}
             <div
                 aria-hidden='true'
-                className='absolute -inset-6 bg-linear-to-tr from-indigo-500/12 via-indigo-400/5 to-transparent blur-2xl rounded-[2rem]'
+                className='absolute -inset-6 bg-linear-to-tr from-navy-500/12 via-gold-400/8 to-transparent blur-2xl rounded-[2rem]'
             />
 
             <div className='relative card shadow-2xl shadow-slate-900/10 overflow-hidden'>
@@ -39,7 +40,7 @@ const DashboardMockup = () => {
                     <span className='w-2.5 h-2.5 rounded-full bg-rose-300' />
                     <span className='w-2.5 h-2.5 rounded-full bg-amber-300' />
                     <span className='w-2.5 h-2.5 rounded-full bg-emerald-300' />
-                    <p className='ml-2 text-[11px] font-medium text-slate-400'>QuickEMS — Dashboard</p>
+                    <p className='ml-2 text-[11px] font-medium text-slate-400'>Academy — Dashboard</p>
                 </div>
 
                 <div className='p-4 sm:p-5'>
@@ -50,7 +51,7 @@ const DashboardMockup = () => {
                                 key={s.label}
                                 className='relative overflow-hidden rounded-lg border border-slate-200/70 bg-white p-3'
                             >
-                                <div className='absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-indigo-500/60' />
+                                <div className='absolute left-0 top-0 bottom-0 w-1 rounded-r-full bg-navy-500/60' />
                                 <s.icon className='w-4 h-4 text-slate-400' />
                                 <p className='text-xl font-semibold text-slate-900 mt-1.5 leading-none'>
                                     {s.value}

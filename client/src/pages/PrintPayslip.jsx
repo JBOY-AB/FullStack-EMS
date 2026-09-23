@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { dummyPayslipData } from '../assets/assets'
 import Loading from '../components/Loading'
+import BrandLogo from '../components/BrandLogo'
 import { format } from "date-fns"
 import api from '../api/axios'
 
@@ -22,8 +23,12 @@ const PrintPayslip = () => {
 
   return (
     <div className='max-w-2xl mx-auto p-8 bg-white animate-fade-in'>
-      <div className='text-center border-b border-slate-200 pb-6 mb-8'>
-        <h1 className='text-2xl font-bold text-slate-900 tracking-tight'>PAYSLIP</h1>
+      {/* Letterhead — a payslip is the most official document this portal
+          emits, so it carries the academy's mark and name. The gold rule and
+          the SVG mark both survive printing; CSS backgrounds would not. */}
+      <div className='text-center border-b-2 border-gold-400 pb-6 mb-8'>
+        <BrandLogo variant='full' className='justify-center' />
+        <h1 className='text-2xl font-bold text-navy-900 tracking-tight mt-5'>PAYSLIP</h1>
         <p className='text-slate-500 text-sm mt-1'>
           {format(new Date(payslip.year, payslip.month - 1), "MMMM yyyy")}
         </p>
