@@ -210,7 +210,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
             />
           </div>
           {!isEditMode && (
-            <div className="sm:col-span-2 flex items-start gap-2 rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-700">
+            <div className="sm:col-span-2 flex items-start gap-2 rounded-lg bg-navy-50 border border-navy-100 p-3 text-xs text-navy-700">
               <span>
                 A secure temporary password will be generated automatically and
                 shown to you once after the employee is created.

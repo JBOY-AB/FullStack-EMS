@@ -4,6 +4,7 @@ import Employee from "../models/Employee.js";
 import LeaveApplication from "../models/LeaveApplication.js";
 import sendEmail from "../config/nodemailer.js";
 import { VERIFICATION_IMAGE_RETENTION_DAYS } from "../constants/attendance.js";
+import { ACADEMY_NAME } from "../constants/brand.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "fullstack-ems" });
@@ -185,11 +186,11 @@ const attendanceReminderCron = inngest.createFunction(
                 <h2>Hi ${emp.firstName}, &#128075;</h2>
                 <p style="font-size: 16px">We noticed you haven't marked your attendance for today.</p>
                 <p style="font-size: 16px">The deadline was <strong>11:30 AM</strong> and your attendance is still missing.</p>
-                <p style="font-size: 16px" >Please check in as soon as possible. or contact your admin if you're facing any issues.</p>
+                <p style="font-size: 16px" >Please check in as soon as possible, or contact the administration if you're facing any issues.</p>
                 <br />
                 <p style="font-size: 14px; color: #666;">Department: ${emp.department}</p>
-                <p style="font-size: 16px;">Best Regard</p>
-                <p style="font-size: 16px;"><strong>QuickEMS</strong></p>
+                <p style="font-size: 16px;">Best regards,</p>
+                <p style="font-size: 16px;"><strong>${ACADEMY_NAME}</strong></p>
             </div>`
           });
         });

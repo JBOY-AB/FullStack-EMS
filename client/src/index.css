@@ -1,6 +1,46 @@
 @import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
 
+/* Prominent Promise Impact Network Academy — brand palette.
+   Tailwind v4 is CSS-first, so these tokens ARE the theme; there is no
+   tailwind.config.js. Declaring them here generates bg-navy-700,
+   text-gold-600, ring-navy-500/40 and so on automatically.
+
+   Roles: navy carries the work (buttons, links, active nav, dark surfaces),
+   gold is a reserved accent (the mark, section eyebrows, active indicators).
+
+   Contrast notes, checked against WCAG AA:
+     - gold-500 on white is only ~3:1 — good for icons, borders and large
+       display type, NOT for body text. Small gold text on white must use
+       gold-700 (~6:1).
+     - gold on navy is the safe pairing and is where most gold belongs.
+     - gold-500 (#c99a1b) is deliberately deeper than amber-500 (#f59e0b) so
+       brand gold stays distinct from the amber "Late"/"Pending" badges. */
+@theme {
+    --color-navy-50: #eef2f9;
+    --color-navy-100: #d9e1f0;
+    --color-navy-200: #b9c8e2;
+    --color-navy-300: #8ea7ce;
+    --color-navy-400: #5d7fb4;
+    --color-navy-500: #3d5f99;
+    --color-navy-600: #2d4a7d;
+    --color-navy-700: #233a63;
+    --color-navy-800: #1b2d4d;
+    --color-navy-900: #14223b;
+    --color-navy-950: #0b1526;
+
+    --color-gold-50: #fdf8e7;
+    --color-gold-100: #faefc4;
+    --color-gold-200: #f5e08d;
+    --color-gold-300: #edcb53;
+    --color-gold-400: #e0b429;
+    --color-gold-500: #c99a1b;
+    --color-gold-600: #a87d14;
+    --color-gold-700: #866114;
+    --color-gold-800: #6d4e17;
+    --color-gold-900: #5c4118;
+}
+
 * {
     font-family: "Outfit", "Inter";
 }
@@ -14,15 +54,16 @@
         @apply hover:-translate-y-0.5 transition-all duration-300;
     }
 
-    /* Button styles */
+    /* Button styles — solid navy rather than a gradient: it reads more
+       institutional and avoids visible banding on the dark CTA panel. */
     .btn-primary {
-        @apply bg-linear-to-r from-indigo-600 to-indigo-500 text-white px-5 py-2.5 rounded-md text-sm
-            hover:from-indigo-700 hover:to-indigo-600 transition-all duration-200 shadow-md shadow-indigo-500/25
+        @apply bg-navy-700 text-white px-5 py-2.5 rounded-md text-sm
+            hover:bg-navy-800 transition-all duration-200 shadow-md shadow-navy-900/20
             active:scale-[0.98];
     }
     .btn-secondary {
-        @apply bg-white text-slate-700 border border-slate-200 px-5 py-2.5 rounded-md text-sm
-            hover:bg-slate-50 hover:border-slate-300 transition-all duration-200;
+        @apply bg-white text-navy-700 border border-navy-200 px-5 py-2.5 rounded-md text-sm
+            hover:bg-navy-50 hover:border-navy-300 transition-all duration-200;
     }
 
     /* Input, Select, Textarea styles */
@@ -30,7 +71,7 @@
     select,
     textarea {
         @apply w-full px-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-md
-            focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400
+            focus:outline-none focus:ring-2 focus:ring-navy-500/20 focus:border-navy-400
             transition-all duration-200 text-sm placeholder:text-slate-400;
     }
 
@@ -54,7 +95,9 @@
         @apply px-6 py-4;
     }
 
-    /* Badge styles */
+    /* Badge styles — these are status signals, not brand. Deliberately left on
+       emerald/amber/rose so "Late" and "Rejected" stay readable as warnings
+       next to the gold brand accents. */
     .badge {
         @apply inline-flex items-center px-2.5 py-1 rounded-md text-xs;
     }
@@ -77,6 +120,12 @@
     }
     .page-subtitle {
         @apply text-slate-500 text-sm mt-1;
+    }
+
+    /* Section eyebrow — the small caps label above a heading. Gold-700 because
+       it is small text on white. */
+    .eyebrow {
+        @apply text-[11px] font-semibold uppercase tracking-[0.14rem] text-gold-700;
     }
 
     /* Animations */
@@ -127,13 +176,13 @@ html {
     @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
+    @apply bg-navy-200 rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    @apply bg-navy-300;
 }
 
 /* Selection */
 ::selection {
-    @apply bg-indigo-100 text-indigo-900;
+    @apply bg-navy-100 text-navy-900;
 }

@@ -85,13 +85,13 @@ const Employee = () => {
       {/* Employee Cards */}
       {loading ? (
         <div className='flex justify-center p-12'>
-          <div className='animate-spin h-8 w-8 border-2 border-indigo-600 border-t-transparent rounded-full' />
+          <div className='animate-spin h-8 w-8 border-2 border-navy-600 border-t-transparent rounded-full' />
         </div>
       ) : employees.length === 0 ? (
         // Empty state — no employees exist yet
         <div className='text-center py-16 px-6 bg-white rounded-2xl border border-dashed border-slate-200'>
-          <div className='mx-auto w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center mb-4'>
-            <Users className='w-7 h-7 text-indigo-400' />
+          <div className='mx-auto w-14 h-14 rounded-full bg-navy-50 flex items-center justify-center mb-4'>
+            <Users className='w-7 h-7 text-navy-400' />
           </div>
           <h3 className='text-slate-900 font-semibold'>No employees yet</h3>
           <p className='text-slate-500 text-sm mt-1 mb-6'>
