@@ -73,6 +73,16 @@ export const createVerificationChallenge = async (req, res) => {
     if (employee.isDeleted)
       return res.status(403).json({ error: "Your account is deactivated. you cannot clock in or out." });
 
+    const activeSession = await AttendanceSession.findOne({
+      isActive: true,
+      expiresAt: { $gt: new Date() },
+    });
+    if (!activeSession) {
+      return res.status(403).json({
+        error: "Clock-in is unavailable until an admin starts an attendance session.",
+      });
+    }
+
     const nonce = crypto.randomBytes(24).toString("hex");
     const expiresAt = new Date(Date.now() + CHALLENGE_TTL_MINUTES * 60 * 1000);
     await VerificationChallenge.create({ employeeId: employee._id, nonce, expiresAt });
@@ -127,27 +137,24 @@ export const clockInOut = async (req, res) => {
         return res.status(400).json({ error: "Webcam verification is required to clock in." });
       }
 
-      // 3) optional attendance session: if one is active, its code must match
+      // 3) an active admin session and matching code are always required
       const activeSession = await AttendanceSession.findOne({
         isActive: true,
         expiresAt: { $gt: now },
       });
-      let attendanceSessionId = null;
-      if (activeSession) {
-        if (!sessionCode || String(sessionCode).trim() !== activeSession.code) {
-          await logVerification({ employee, session, status: "failed", reason: "invalid_session_code" });
-          return res.status(400).json({
-            error: "Invalid attendance code. Ask your employer for the current code.",
-          });
-        }
-        attendanceSessionId = activeSession._id;
-      } else if (sessionCode) {
-        // a code was supplied but nothing is active → the session has expired
+      if (!activeSession) {
         await logVerification({ employee, session, status: "failed", reason: "session_expired" });
-        return res.status(400).json({
-          error: "This attendance session has expired. Ask your employer to start a new one.",
+        return res.status(403).json({
+          error: "Clock-in is unavailable until an admin starts an attendance session.",
         });
       }
+      if (!sessionCode || String(sessionCode).trim() !== activeSession.code) {
+        await logVerification({ employee, session, status: "failed", reason: "invalid_session_code" });
+        return res.status(400).json({
+          error: "Invalid attendance code. Ask your employer for the current code.",
+        });
+      }
+      const attendanceSessionId = activeSession._id;
 
       // 4) consume the challenge so it cannot be reused
       challenge.used = true;
