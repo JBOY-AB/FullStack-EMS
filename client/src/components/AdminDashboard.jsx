@@ -9,7 +9,7 @@ const AdminDashboard = ({ data }) => {
         {
             icon: UserIcon,
             value: data?.totalEmployees ?? data?.totalEmployee,
-            label: "Total Employees",
+            label: "Team Members",
             description: "Active workforce",
         },
         {
@@ -72,7 +72,7 @@ const AdminDashboard = ({ data }) => {
                     to="/employees"
                     className='btn-secondary text-center inline-flex items-center justify-center gap-2'
                 >
-                    Manage Employees <ArrowRightIcon className='w-4 h-4' />
+                    Manage Team <ArrowRightIcon className='w-4 h-4' />
                 </Link>
             </div>
         </div>

@@ -36,7 +36,7 @@ const PrintPayslip = () => {
 
       <div className='grid grid-cols-2 gap-6 mb-8'>
         <div>
-          <p className='text-xs text-slate-400 uppercase tracking-wider mb-1'>Employee Name</p>
+          <p className='text-xs text-slate-400 uppercase tracking-wider mb-1'>Team Member Name</p>
           <p className='font-semibold text-slate-900'>
             {payslip.employee?.firstName} {payslip.employee?.lastName}
           </p>

@@ -37,7 +37,7 @@ const EmployeeCreatedModal = ({ open, onClose, employee, temporaryPassword }) =>
             <span className='flex items-center justify-center w-6 h-6 rounded-full bg-emerald-100'>
               <CheckIcon className='w-4 h-4 text-emerald-600' />
             </span>
-            Employee Created
+            Team Member Created
           </h2>
 
           <button
@@ -82,7 +82,7 @@ const EmployeeCreatedModal = ({ open, onClose, employee, temporaryPassword }) =>
               </button>
             </div>
             <p className='text-xs text-slate-500 mt-2'>
-              Share this with the employee. They'll be required to change it on
+              Share this with the team member. They'll be required to change it on
               first login, and it won't be shown again.
             </p>
           </div>

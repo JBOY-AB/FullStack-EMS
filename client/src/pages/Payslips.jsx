@@ -43,7 +43,7 @@ const Payslips = () => {
           <h1 className="page-title">Payslips</h1>
           <p className="page-subtitle">
             {isAdmin
-              ? "Generate and manage employee payslips"
+              ? "Generate and manage team payslips"
               : "Your payslip history"}
           </p>
         </div>

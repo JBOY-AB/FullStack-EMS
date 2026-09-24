@@ -46,11 +46,11 @@ const GeneratePayslipForm = ({ employees = [], onSuccess }) => {
 
                 <form onSubmit={handleSubmit} className='space-y-4'>
 
-                    {/* Select Employee */}
+                    {/* Select team member */}
                     <div>
-                        <label className='block text-sm font-medium text-slate-700 mb-2'>Employee</label>
+                        <label className='block text-sm font-medium text-slate-700 mb-2'>Team Member</label>
                         <select name='employeeId' required className='w-full'>
-                            <option value=''>-- Select Employee --</option>
+                            <option value=''>-- Select Team Member --</option>
                             {employees.map((e) => (
                                 <option key={e.id} value={e.id}>
                                     {e.firstName} {e.lastName} ({e.position})

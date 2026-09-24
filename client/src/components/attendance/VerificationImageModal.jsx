@@ -66,7 +66,7 @@ const VerificationImageModal = ({ open, onClose, record }) => {
                             Verification
                         </h2>
                         <p className='text-sm text-slate-400 mt-0.5'>
-                            {record?.employee?.name || "Employee"}
+                            {record?.employee?.name || "Team Member"}
                             {record?.verifiedAt
                                 ? ` — ${format(new Date(record.verifiedAt), "MMM dd, hh:mm a")}`
                                 : ""}

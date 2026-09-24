@@ -44,7 +44,7 @@ const Sidebar = () => {
     // Admins manage employees; everyone gets Attendance — employees to clock
     // in/out, admins to run the session and review today's verifications.
     ...(role === 'ADMIN'
-      ? [{ name: 'Employees', path: '/employees', icon: UserIcon }]
+      ? [{ name: 'Team', path: '/employees', icon: UserIcon }]
       : []),
     { name: 'Attendance', path: '/attendance', icon: CalendarIcon },
     { name: 'Leave', path: '/leave', icon: FileTextIcon },
@@ -86,7 +86,7 @@ const Sidebar = () => {
             <div className='min-w-0'>
               <p className='text-[13px] font-medium text-slate-200 truncate'>{userName}</p>
               <p className='text-[11px] text-slate-500 truncate'>
-                {role === 'ADMIN' ? 'Administrator' : 'Employee'}
+                {role === 'ADMIN' ? 'Administrator' : 'Team Member'}
               </p>
             </div>
           </div>

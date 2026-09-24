@@ -6,10 +6,10 @@ import toast from 'react-hot-toast'
 const EmployeeCard = ({ employee, onDelete, onEdit }) => {
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this employee?")) return
+    if (!confirm("Are you sure you want to remove this team member?")) return
     try {
       await api.delete(`/employees/${employee.id}`)
-      toast.success("Employee deleted")
+      toast.success("Team member removed")
       onDelete()
     } catch (error) {
       toast.error(error.response?.data?.error || error.message)

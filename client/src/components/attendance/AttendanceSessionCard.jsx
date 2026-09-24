@@ -97,7 +97,7 @@ const AttendanceSessionCard = () => {
                                 ? "Checking..."
                                 : isActive
                                     ? "Active — share the code with your team"
-                                    : "Inactive — employees can clock in without a code"}
+                                    : "Inactive — team members can clock in without a code"}
                         </p>
                     </div>
                 </div>

@@ -52,7 +52,7 @@ const Attendance = () => {
 
       {isDeleted ? (
         <div className='mb-8 p-6 bg-rose-50 bordr border-rose-200 rounded-2xl text-center'>
-          <p className='text-rose-600'>You can no longer clock in or out because your employee records have been marked as deleted</p>
+          <p className='text-rose-600'>You can no longer clock in or out because your team record has been removed</p>
         </div>
       ):(
         <div className='mb-8'>
