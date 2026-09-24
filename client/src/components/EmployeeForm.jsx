@@ -111,7 +111,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
               type="file"
               name="profilePicture"
               accept="image/*"
-              className="w-full"
+              className="w-120"
             />
             <p className="text-xs text-slate-500 mt-1">Choose an image up to 2 MB.</p>
           </div>

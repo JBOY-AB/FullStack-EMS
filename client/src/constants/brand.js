@@ -5,11 +5,11 @@
 // and a leftover "Your Company" all ended up shipping at the same time.
 // Import from here instead of typing the name again.
 
-export const ACADEMY_NAME = 'Prominent Promise Impact Network Academy'
+export const ACADEMY_NAME = 'Prominent Promise Impact Network Ltd'
 
 // The full name is five words, so most layouts need it broken over two lines
 // rather than shrunk until it fits.
 export const ACADEMY_NAME_LINE_1 = 'Prominent Promise'
-export const ACADEMY_NAME_LINE_2 = 'Impact Network Academy'
+export const ACADEMY_NAME_LINE_2 = 'Impact Network Ltd'
 
 export const ACADEMY_TAGLINE = 'Staff Portal'
