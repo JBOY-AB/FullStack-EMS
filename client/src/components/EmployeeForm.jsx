@@ -16,20 +16,18 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
   setLoading(true)
 
   const formData = new FormData(e.currentTarget)
-  const payload = Object.fromEntries(formData.entries())
-
-  if (isEditMode && !payload.password) {
-    delete payload.password
+    if (isEditMode && !formData.get("password")) {
+      formData.delete("password")
   }
 
   try {
     const url = isEditMode ? `/employees/${initialData.id}` : "/employees"
     const method = isEditMode ? "put" : "post"
 
-    const { data } = await api[method](url, payload)
+    const { data } = await api[method](url, formData)
 
     if (isEditMode) {
-      toast.success("Employee updated")
+      toast.success("Team member updated")
       onSuccess ? onSuccess() : navigate("/employee")
     } else {
       // hand the generated temporary password back so the employer can copy it
@@ -105,6 +103,17 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
               className="resize-none"
               placeholder="Brief description..."
             />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="block mb-2">Profile Picture (Optional)</label>
+            <input
+              type="file"
+              name="profilePicture"
+              accept="image/*"
+              className="w-120"
+            />
+            <p className="text-xs text-slate-500 mt-1">Choose an image up to 2 MB.</p>
           </div>
         </div>
       </div>
@@ -213,7 +222,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
             <div className="sm:col-span-2 flex items-start gap-2 rounded-lg bg-navy-50 border border-navy-100 p-3 text-xs text-navy-700">
               <span>
                 A secure temporary password will be generated automatically and
-                shown to you once after the employee is created.
+                shown to you once after the team member is added.
               </span>
             </div>
           )}
@@ -232,7 +241,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
              <div >
               <label className="block mb-2">System Role</label>
               <select name="role" defaultValue={initialData?.user?.role || "EMPLOYEE"}>
-                <option value="EMPLOYEE">Employee</option>
+                <option value="EMPLOYEE">Team Member</option>
                 <option value="ADMIN">Admin</option>
               </select>
             </div>
@@ -248,7 +257,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
             </button>
             <button type="submit" disabled={loading} className="btn-primary flex items-center justify-center">
                 {loading && <Loader2Icon  className="w-4 h-4 mr-2 animate-spin"/>}
-                {isEditMode ? "Update Employee" : "Create Employee"}
+                {isEditMode ? "Update Team Member" : "Add Team Member"}
             </button>
       </div>
     </form>

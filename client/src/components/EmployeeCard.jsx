@@ -6,10 +6,10 @@ import toast from 'react-hot-toast'
 const EmployeeCard = ({ employee, onDelete, onEdit }) => {
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this employee?")) return
+    if (!confirm("Are you sure you want to remove this team member?")) return
     try {
       await api.delete(`/employees/${employee.id}`)
-      toast.success("Employee deleted")
+      toast.success("Team member removed")
       onDelete()
     } catch (error) {
       toast.error(error.response?.data?.error || error.message)
@@ -18,15 +18,22 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
 
   return (
     <div className='group relative card card-hover overflow-hidden rounded-2xl'>
-      {/* Top gradient + circle */}
+      {/* Profile picture area */}
       <div className='relative aspect-4/3 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50'>
         <div className='w-full h-full flex items-center justify-center'>
-          {/* circle icon */}
-          <div className='w-20 h-20 rounded-full bg-gradient-to-br from-navy-100 to-slate-100 flex items-center justify-center shadow-md'>
-            <span className='text-2xl font-medium text-navy-400'>
-              {employee.firstName?.[0]}{employee.lastName?.[0]}
-            </span>
-          </div>
+          {employee.profilePicture ? (
+            <img
+              src={employee.profilePicture}
+              alt={`${employee.firstName} ${employee.lastName}`}
+              className='w-full h-full object-cover'
+            />
+          ) : (
+            <div className='w-20 h-20 rounded-full bg-gradient-to-br from-navy-100 to-slate-100 flex items-center justify-center shadow-md'>
+              <span className='text-2xl font-medium text-navy-400'>
+                {employee.firstName?.[0]}{employee.lastName?.[0]}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

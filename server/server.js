@@ -23,7 +23,14 @@ console.log("  - NODE_ENV:", process.env.NODE_ENV);
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+const allowedOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+}));
 // Clock-in sends a downscaled webcam frame (data URL) alongside JSON, so the
 // body can exceed the 100 KB express default. Capped at 1 MB (image buffer is
 // hard-limited to 500 KB server-side; base64 inflates it by ~33%).
@@ -51,6 +58,9 @@ app.use(async (req, res, next) => {
 
 app.get("/", (req, res) => {
   res.send("Server is running");
+});
+app.get("/health", (req, res) => {
+  res.json({ ok: true });
 });
 app.use("/api/auth", authRouter)
 app.use("/api/employees", employeesRouter)

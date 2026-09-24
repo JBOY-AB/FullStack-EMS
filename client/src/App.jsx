@@ -23,7 +23,7 @@ const App = () => {
         <Route path='/login' element={<LoginLanding />} />
 
         <Route path='/login/admin' element={<LoginForm role="admin" title="Admin Portal" subtitle="Sign in to the administrator panel" />} />
-        <Route path='/login/employee' element={<LoginForm role="employee" title="Employee Portal" subtitle="Access your employee portal" />} />
+        <Route path='/login/employee' element={<LoginForm role="employee" title="Team Portal" subtitle="Access your team portal" />} />
 
 
         <Route element={<Layout />} >

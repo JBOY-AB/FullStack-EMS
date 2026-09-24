@@ -101,7 +101,7 @@ const AdminAttendance = () => {
                     <table className='table-modern'>
                         <thead>
                             <tr>
-                                <th className='px-6 py-4'>Employee</th>
+                                <th className='px-6 py-4'>Team Member</th>
                                 <th className='px-6 py-4'>Department</th>
                                 <th className='px-6 py-4'>Clocked In</th>
                                 <th className='px-6 py-4'>Clocked Out</th>

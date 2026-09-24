@@ -2,10 +2,9 @@
 
 ## Deployment
 
-Set `VITE_BASE_URL` in the Vercel project running the client to the public URL
-of the deployed server, for example `https://your-server.vercel.app`.
-Vite embeds this value during the build, so redeploy the client after changing
-the environment variable. Do not include `/api` in the value.
+Local development uses `VITE_BASE_URL` when provided and otherwise calls
+`http://localhost:4000`. Production builds use the deployed server URL in
+`src/api/axios.js`. Redeploy the client after changing either value.
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

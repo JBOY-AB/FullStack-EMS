@@ -26,7 +26,7 @@ const LeaveHistory = ({ leaves, isAdmin, onUpdate }) => {
         <table className='table-modern'>
           <thead>
             <tr>
-              {isAdmin && <th>Employee</th>}
+              {isAdmin && <th>Team Member</th>}
 
               <th>Type</th>
               <th>Dates</th>

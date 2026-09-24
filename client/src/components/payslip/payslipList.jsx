@@ -9,7 +9,7 @@ const PayslipList = ({ payslips = [], isAdmin }) => {
         <table className='table-modern'>
           <thead>
             <tr>
-              {isAdmin && <th>Employee</th>}
+              {isAdmin && <th>Team Member</th>}
               <th>Period</th>
               <th>Basic Salary</th>
               <th>Net Salary</th>

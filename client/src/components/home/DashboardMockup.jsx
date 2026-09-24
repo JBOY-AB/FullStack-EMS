@@ -8,7 +8,7 @@ import { ACADEMY_NAME } from '../../constants/brand'
 // verification badge. (There is no break tracking in this EMS, so none is shown.)
 
 const STATS = [
-    { icon: UsersIcon, label: 'Employees', value: '42' },
+    { icon: UsersIcon, label: 'Team Members', value: '42' },
     { icon: Building2Icon, label: 'Departments', value: '6' },
     { icon: CalendarCheckIcon, label: "Today's Attendance", value: '35' },
     { icon: FileTextIcon, label: 'Pending Leaves', value: '3' },

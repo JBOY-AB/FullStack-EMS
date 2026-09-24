@@ -42,8 +42,8 @@ const Employee = () => {
       {/* Header */}
       <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8'>
         <div>
-          <h1 className='page-title'>Employee</h1>
-          <p className='page-subtitle'>Manage your employees</p>
+          <h1 className='page-title'>Team</h1>
+          <p className='page-subtitle'>Manage your team</p>
         </div>
 
         <button
@@ -51,7 +51,7 @@ const Employee = () => {
           className='btn-primary flex items-center gap-2 w-full sm:w-auto justify-center'
         >
           <Plus size={16} />
-          Add Employee
+          Add Team Member
         </button>
       </div>
 
@@ -61,7 +61,7 @@ const Employee = () => {
           <Search className='absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4' />
           <input
             type='text'
-            placeholder='Search employees...'
+            placeholder='Search team members...'
             className='w-full pl-10'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -93,22 +93,22 @@ const Employee = () => {
           <div className='mx-auto w-14 h-14 rounded-full bg-navy-50 flex items-center justify-center mb-4'>
             <Users className='w-7 h-7 text-navy-400' />
           </div>
-          <h3 className='text-slate-900 font-semibold'>No employees yet</h3>
+          <h3 className='text-slate-900 font-semibold'>No team members yet</h3>
           <p className='text-slate-500 text-sm mt-1 mb-6'>
-            Create your first employee to get started.
+            Add your first team member to get started.
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
             className='btn-primary inline-flex items-center gap-2'
           >
             <Plus size={16} />
-            Add Employee
+            Add Team Member
           </button>
         </div>
       ) : filtered.length === 0 ? (
         // Employees exist but none match the current search/filter
         <p className='text-center py-16 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200'>
-          No employees match your search
+          No team members match your search
         </p>
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5'>
@@ -137,10 +137,10 @@ const Employee = () => {
             <div className='flex items-center justify-between p-6 pb-0'>
               <div>
                 <h2 className='text-lg font-semibold text-slate-900'>
-                  Add New Employee
+                  Add New Team Member
                 </h2>
                 <p className='text-sm text-slate-500 mt-0.5'>
-                  Create a user account and employee profile
+                  Create a user account and team member profile
                 </p>
               </div>
 
@@ -181,10 +181,10 @@ const Employee = () => {
             <div className='flex items-center justify-between p-6 pb-0'>
               <div>
                 <h2 className='text-lg font-semibold text-slate-900'>
-                  Edit Employee
+                  Edit Team Member
                 </h2>
                 <p className='text-sm text-slate-500 mt-0.5'>
-                  Update employee details
+                  Update team member details
                 </p>
               </div>
 
