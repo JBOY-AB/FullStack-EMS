@@ -21,12 +21,19 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
       {/* Top gradient + circle */}
       <div className='relative aspect-4/3 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50'>
         <div className='w-full h-full flex items-center justify-center'>
-          {/* circle icon */}
-          <div className='w-20 h-20 rounded-full bg-gradient-to-br from-navy-100 to-slate-100 flex items-center justify-center shadow-md'>
-            <span className='text-2xl font-medium text-navy-400'>
-              {employee.firstName?.[0]}{employee.lastName?.[0]}
-            </span>
-          </div>
+          {employee.profilePicture ? (
+            <img
+              src={employee.profilePicture}
+              alt={`${employee.firstName} ${employee.lastName}`}
+              className='w-24 h-24 rounded-full object-cover shadow-md'
+            />
+          ) : (
+            <div className='w-20 h-20 rounded-full bg-gradient-to-br from-navy-100 to-slate-100 flex items-center justify-center shadow-md'>
+              <span className='text-2xl font-medium text-navy-400'>
+                {employee.firstName?.[0]}{employee.lastName?.[0]}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

@@ -16,17 +16,15 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
   setLoading(true)
 
   const formData = new FormData(e.currentTarget)
-  const payload = Object.fromEntries(formData.entries())
-
-  if (isEditMode && !payload.password) {
-    delete payload.password
+    if (isEditMode && !formData.get("password")) {
+      formData.delete("password")
   }
 
   try {
     const url = isEditMode ? `/employees/${initialData.id}` : "/employees"
     const method = isEditMode ? "put" : "post"
 
-    const { data } = await api[method](url, payload)
+    const { data } = await api[method](url, formData)
 
     if (isEditMode) {
       toast.success("Team member updated")
@@ -105,6 +103,17 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
               className="resize-none"
               placeholder="Brief description..."
             />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="block mb-2">Profile Picture (Optional)</label>
+            <input
+              type="file"
+              name="profilePicture"
+              accept="image/*"
+              className="w-full"
+            />
+            <p className="text-xs text-slate-500 mt-1">Choose an image up to 2 MB.</p>
           </div>
         </div>
       </div>
