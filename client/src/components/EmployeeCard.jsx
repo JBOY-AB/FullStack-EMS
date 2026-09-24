@@ -18,14 +18,14 @@ const EmployeeCard = ({ employee, onDelete, onEdit }) => {
 
   return (
     <div className='group relative card card-hover overflow-hidden rounded-2xl'>
-      {/* Top gradient + circle */}
+      {/* Profile picture area */}
       <div className='relative aspect-4/3 w-full overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50'>
         <div className='w-full h-full flex items-center justify-center'>
           {employee.profilePicture ? (
             <img
               src={employee.profilePicture}
               alt={`${employee.firstName} ${employee.lastName}`}
-              className='w-24 h-24 rounded-full object-cover shadow-md'
+              className='w-full h-full object-cover'
             />
           ) : (
             <div className='w-20 h-20 rounded-full bg-gradient-to-br from-navy-100 to-slate-100 flex items-center justify-center shadow-md'>
