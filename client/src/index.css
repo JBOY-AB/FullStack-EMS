@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
 
-/* Prominent Promise Impact Network Academy — brand palette.
+/* Prominence Promise Impact Network Academy — brand palette.
    Tailwind v4 is CSS-first, so these tokens ARE the theme; there is no
    tailwind.config.js. Declaring them here generates bg-navy-700,
    text-gold-600, ring-navy-500/40 and so on automatically.
